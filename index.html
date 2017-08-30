@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Lord of Dunans</title>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato" />
+		<link rel="stylesheet" href="css/main.css" />
+		<style id="toggle_login"></style>
+	</head>
+	<body>
+		<canvas id="canvas"></canvas>
+		
+		<h1 id="title" data-l10n="$main_title"></h1>
+		
+		<div id="title_options" style="display: none;">
+			<div class="option" id="play_option" data-l10n="$main_play"></div>
+		</div>
+		
+		<div id="button_bar" class="clear_fix" style="display: none;">
+			<div id="register_button" data-l10n="$gui_register" class="button log_off"></div>
+			<div id="login_button" data-l10n="$gui_login" class="button log_off"></div>
+			
+			<div id="logout_button" data-l10n="$gui_logout" class="button log_on"></div>
+			<div id="uname_bar" class="inject_uname log_on"></div>
+		</div>
+		
+		<script src="output.js"></script>
+	</body>
+</html>

@@ -1,0 +1,58 @@
+#title {
+	position: fixed;
+	top: 20%;
+	left: 50%;
+	transform: translateX(-50%);
+	color: white;
+	font-size: 3.4em;
+}
+
+#button_bar {
+	position: fixed;
+	top: 0.3em;
+	right: 0.3em;
+}
+
+.button {
+	float: right;
+	background: #7d7e7d; /* Old browsers */
+	background: -moz-linear-gradient(top, #7d7e7d 0%, #0e0e0e 100%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(top, #7d7e7d 0%,#0e0e0e 100%); /* Chrome10-25,Safari5.1-6 */
+	background: linear-gradient(to bottom, #7d7e7d 0%,#0e0e0e 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	border: 3px solid #fff;
+	border-radius: 0.2em;
+	padding: 0.6em 1.1em;
+	margin: 0.2em;
+	cursor: pointer;
+}
+
+#uname_bar {
+	float: right;
+	margin: 0.1em;
+	padding: 0.3em;
+	font-size: 1.4em;
+}
+
+.clear_fix:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.login_error {
+	color: red;
+	font-weight: bold;
+}
+
+#title_options {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	text-align: center;
+	font-size: 2em;
+}
+
+.option {
+	cursor: pointer;
+}

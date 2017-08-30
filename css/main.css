@@ -1,0 +1,23 @@
+@import "vex.css";
+@import "vex-theme-os.css";
+
+@import "menu.css";
+
+html {
+	font-family: Lato, sans-serif;
+	color: #fff;
+}
+
+html, body {
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+#canvas {
+	width: 100%;
+	height: 100%;
+	touch-action: none;
+}
