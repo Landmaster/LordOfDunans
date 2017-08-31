@@ -38,12 +38,12 @@ Player.prototype.despawn = function () {
 Player.prototype.serialize = function (buf) {
 	buf.append(this.uuid);
 	buf.writeVString(this.uname);
-	Vec3d.toBuf(this.pos, buf);
+	Vec3.toBuf(this.pos, buf);
 }
 Player.prototype.deserialize = function (buf) {
-	this.uuid = buf.readBytes(16);
+	this.uuid = new Uint8Array(buf.readBytes(16).toBuffer());
 	this.uname = buf.readVString();
-	this.pos = Vec3d.fromBuf(buf);
+	this.pos = Vec3.fromBuf(buf);
 }
 
 module.exports = Player;

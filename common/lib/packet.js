@@ -1,6 +1,7 @@
 const EntityRegistry = require('common/entity_registry');
 const Player = require('common/player');
 const UuidUtils = require('common/lib/uuid_utils');
+const ByteBuffer = require('bytebuffer');
 
 const Packet = {};
 
@@ -216,9 +217,11 @@ Packet.timeoutPacket.prototype.serialize = function () {};
 
 Packet.playListPacket = function playListPacket(players) {
 	let _buf = new ByteBuffer();
-	_buf.writeVarint32(players.length);
-	players.forEach(player => player.serialize(_buf));
-	_buf.flip();
+	if (players) {
+		_buf.writeVarint32(players.length);
+		players.forEach(player => player.serialize(_buf));
+		_buf.flip();
+	}
 	/**
 	 * @type {ArrayBuffer}
 	 */

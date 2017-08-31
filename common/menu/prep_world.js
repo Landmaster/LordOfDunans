@@ -5,6 +5,11 @@
 const World = require('common/world');
 const Side = require('common/lib/side');
 
+/**
+ * 
+ * @param mainInstance the main instance
+ * @returns
+ */
 function PreparationWorld(mainInstance) {
 	World.call(this, mainInstance);
 	if (Side.getSide() === Side.CLIENT) {

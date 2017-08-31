@@ -18,9 +18,7 @@ PacketHandler.register(0x9, Packet.playPacket, (packet, mainInstance, ctx) => {
 			
 			findRandomOpponent(mainInstance, player, 5000)
 			.then((list) => {
-				if (player === list[0]) { // first player
-					console.log(list.map(pl => pl.uname));
-				}
+				PacketHandler.sendToEndpoint(new Packet.playListPacket(list), ctx.ws); // send the player data to the client
 			})
 			.catch(Promise.TimeoutError, e => {
 				console.log('Timed out');
@@ -40,5 +38,12 @@ PacketHandler.register(0xA, Packet.timeoutPacket, (packet, mainInstance, ctx) =>
 		
 		const vex = require('vex-js');
 		vex.dialog.alert('$error_timeout'.toLocaleString());
+	}
+});
+PacketHandler.register(0xB, Packet.playListPacket, (packet, mainInstance, ctx) => {
+	if (Side.getSide() === Side.CLIENT) {
+		for (let player of packet.getPlayers(mainInstance)) {
+			console.log(player);
+		}
 	}
 });
