@@ -89,7 +89,6 @@ if (Side.getSide() === Side.CLIENT) {
 
 	World.prototype.render = function () {
 		this.nonPlayerEntities.forEach(entity => entity.render());
-		if (!(this.elapsedTicks % 60)) console.log(this.scene);
 		this.scene.render();
 	};
 } else {

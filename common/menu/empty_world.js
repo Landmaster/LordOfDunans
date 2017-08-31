@@ -85,6 +85,15 @@ EmptyWorld.prototype = Object.create(World.prototype, {
 if (Side.getSide() === Side.CLIENT) {
 	EmptyWorld.prototype.play = function () {
 		this.mainInstance.sendToServer(new Packet.playPacket());
+		
+		const PreparationWorld = require('./prep_world');
+		
+		const newWorld = new PreparationWorld(this.mainInstance);
+		if (this.mainInstance.thePlayer) {
+			this.mainInstance.thePlayer.despawn(this.mainInstance.theWorld);
+			this.mainInstance.thePlayer.spawn(newWorld);
+		}
+		this.mainInstance.setWorld(newWorld);
 	};
 	
 	EmptyWorld.prototype.openLRDialog = function (isRegister)  {

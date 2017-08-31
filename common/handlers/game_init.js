@@ -31,10 +31,10 @@ PacketHandler.register(0x9, Packet.playPacket, (packet, mainInstance, ctx) => {
 });
 PacketHandler.register(0xA, Packet.timeoutPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT) {
-		let newWorld = new EmptyWorld(mainInstance);
-		if (this.thePlayer) {
-			this.thePlayer.despawn(this.theWorld);
-			this.thePlayer.spawn(newWorld);
+		const newWorld = new EmptyWorld(mainInstance);
+		if (mainInstance.thePlayer) {
+			mainInstance.thePlayer.despawn(mainInstance.theWorld);
+			mainInstance.thePlayer.spawn(newWorld);
 		}
 		mainInstance.setWorld(newWorld);
 		
