@@ -9,6 +9,9 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const UuidUtils = require('common/lib/uuid_utils');
 const PacketHandler = require('common/packethandler_registrar');
+const EventBus = require('eventbusjs');
+const PlayerDisconnectedEvent = require('common/events/player_disconnected');
+const PairingSet = require('common/algo/pairing_set');
 
 function Server(app, port, root, databaseFormat) {
 	this.expressWS = require('express-ws')(app);
@@ -58,10 +61,16 @@ function Server(app, port, root, databaseFormat) {
 	this.clientMap = new Map();
 	
 	/**
-	 * Holds the players waiting for opponents.
-	 * @type {Map.<Player, Deferred>}
+	 * Holds the players waiting for opponents, mapping them to a deferred object.
+	 * @type {Map.<Player, defer>}
 	 */
 	this.pendingPlayers = new Map();
+	
+	/**
+	 *
+	 * @type {PairingSet.<Player>}
+	 */
+	this.pairedPlayers = new PairingSet();
 	
 	/**
 	 * WebSocket to uuid string
@@ -134,6 +143,8 @@ Server.prototype.removeClientByUUID = function removeClientByUUID(uuid) {
 		this.pendingPlayers.delete(player);
 		this.clientMap.delete(uuidString);
 		this.wsToUuidString.delete(player.ws);
+		this.pairedPlayers.deleteElem(player);
+		EventBus.dispatch(PlayerDisconnectedEvent.NAME, this, new PlayerDisconnectedEvent());
 	}
 };
 

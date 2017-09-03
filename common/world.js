@@ -4,6 +4,12 @@
 
 const Side = require('./lib/side');
 const gameloop = require('node-gameloop');
+const UuidUtils = require('./lib/uuid_utils');
+const EventBus = require('eventbusjs');
+const EntityAddedEvent = require('common/events/entity_added');
+const EntityRemovedEvent = require('common/events/entity_removed');
+const PlayerAddedEvent = require('common/events/player_added');
+const PlayerRemovedEvent = require('common/events/player_removed');
 
 /**
  * Create a new world.
@@ -53,6 +59,26 @@ function World(mainInstance) {
 	 */
 	this.nonPlayerEntities = new Map();
 }
+
+World.prototype.addEntity = function (entity) {
+	this.nonPlayerEntities.set(UuidUtils.bytesToUuid(entity.uuid), entity);
+	EventBus.dispatch(EntityAddedEvent.NAME, this, new EntityAddedEvent(this, entity));
+};
+
+World.prototype.removeEntity = function (entity) {
+	this.nonPlayerEntities.delete(UuidUtils.bytesToUuid(entity.uuid));
+	EventBus.dispatch(EntityRemovedEvent.NAME, this, new EntityRemovedEvent(this, entity));
+};
+
+World.prototype.addPlayer = function (player) {
+	this.players.set(UuidUtils.bytesToUuid(player.uuid), player);
+	EventBus.dispatch(PlayerAddedEvent.NAME, this, new PlayerAddedEvent(this, player));
+};
+
+World.prototype.removePlayer = function (player) {
+	this.players.delete(UuidUtils.bytesToUuid(player.uuid));
+	EventBus.dispatch(PlayerRemovedEvent.NAME, this, new PlayerRemovedEvent(this, player));
+};
 
 /**
  * Loads the world.

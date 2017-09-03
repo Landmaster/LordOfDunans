@@ -1,27 +1,36 @@
 const Promise = require('bluebird');
-const defer = require('common/lib/deferred')
+const defer = require('common/lib/deferred');
+const PreparationWorld = require('common/menu/prep_world');
+const EmptyWorld = require('common/menu/empty_world');
 
 /**
  * Search for a random opponent.
  * @param server the Dunans server
  * @param player the player
  * @param timeout the timeout window in milliseconds
- * @returns a promise holding the players
+ * @returns {Promise} a promise holding the players
  */
 function findRandomOpponent(server, player, timeout) {
 	for (let [pendingPlayer, pendingDfd] of server.pendingPlayers) {
 		if (player !== pendingPlayer) { // found a waiting player
 			let arr = [player, pendingPlayer];
-			pendingDfd.resolve(arr);
+			player.despawn();
+			player.spawn(pendingPlayer.world);
 			server.pendingPlayers.delete(pendingPlayer);
+			server.pairedPlayers.addPair(...arr);
+			pendingDfd.resolve(arr);
 			return Promise.resolve(arr);
 		}
 	}
-	const df = defer();
+	const df = new defer();
 	server.pendingPlayers.set(player, df);
+	player.despawn();
+	player.spawn(new PreparationWorld(server));
 	
 	return df.promise.timeout(timeout).catch(Promise.TimeoutError, e => {
 		server.pendingPlayers.delete(player);
+		player.despawn();
+		player.spawn(new EmptyWorld(server));
 		throw e; // propagate the timeout
 	});
 }

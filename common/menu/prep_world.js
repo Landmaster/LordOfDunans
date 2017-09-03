@@ -4,11 +4,14 @@
 
 const World = require('common/world');
 const Side = require('common/lib/side');
+const EventBus = require('eventbusjs');
+const PlayerAddedEvent = require('common/events/player_added');
+const PlayerRemovedEvent = require('common/events/player_removed');
 
 /**
  * 
- * @param mainInstance the main instance
- * @returns
+ * @param {Server|Dunans} mainInstance the main instance
+ * @constructor
  */
 function PreparationWorld(mainInstance) {
 	World.call(this, mainInstance);
@@ -42,7 +45,20 @@ if (Side.getSide() === Side.CLIENT) {
 		// lights on!
 		this.light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(-1, 1, 0), this.scene);
 		this.light.intensity = 0.5;
-	}
+		
+		this.matchReview = document.getElementById("match_review");
+		
+		this.htmlElementsToToggle.push(this.matchReview);
+	};
+	
+	const playerUpdateHandler = function (ev, data) {
+		if (data.world instanceof PreparationWorld) {
+			console.log(data.world.players);
+		}
+	};
+	
+	EventBus.addEventListener(PlayerAddedEvent.NAME, playerUpdateHandler);
+	EventBus.addEventListener(PlayerRemovedEvent.NAME, playerUpdateHandler);
 }
 
 module.exports = PreparationWorld;

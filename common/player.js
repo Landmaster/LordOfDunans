@@ -29,21 +29,21 @@ function Player(world, ws, mainInstance, options) {
 }
 Player.prototype.spawn = function (world) {
 	this.world = world;
-	this.world.players.set(UuidUtils.bytesToUuid(this.uuid), this);
+	this.world.addPlayer(this);
 };
 Player.prototype.despawn = function () {
-	this.world.players.delete(UuidUtils.bytesToUuid(this.uuid));
+	this.world.removePlayer(this);
 	this.world = null;
 };
 Player.prototype.serialize = function (buf) {
 	buf.append(this.uuid);
 	buf.writeVString(this.uname);
 	Vec3.toBuf(this.pos, buf);
-}
+};
 Player.prototype.deserialize = function (buf) {
 	this.uuid = new Uint8Array(buf.readBytes(16).toBuffer());
 	this.uname = buf.readVString();
 	this.pos = Vec3.fromBuf(buf);
-}
+};
 
 module.exports = Player;

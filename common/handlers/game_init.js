@@ -7,6 +7,7 @@ const Packet = require('common/lib/packet');
 const Side = require('common/lib/side');
 const Promise = require('bluebird');
 const EmptyWorld = require('common/menu/empty_world');
+const PreparationWorld = require('common/menu/prep_world');
 
 PacketHandler.register(0x9, Packet.playPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.SERVER) {
@@ -43,7 +44,9 @@ PacketHandler.register(0xA, Packet.timeoutPacket, (packet, mainInstance, ctx) =>
 PacketHandler.register(0xB, Packet.playListPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT) {
 		for (let player of packet.getPlayers(mainInstance)) {
-			console.log(player);
+			if (player !== mainInstance.thePlayer && mainInstance.theWorld instanceof PreparationWorld) {
+				player.spawn(mainInstance.theWorld);
+			}
 		}
 	}
 });

@@ -26,15 +26,11 @@ Entity.prototype.serialize = function (buf) {
  */
 Entity.prototype.spawn = function(world) {
 	this.world = world;
-	if (Side.getSide() === Side.SERVER) {
-		this.world.nonPlayerEntities.set(UuidUtils.bytesToUuid(this.uuid), this);
-	}
+	this.world.addEntity(this);
 };
 
 Entity.prototype.despawn = function() {
-	if (Side.getSide() === Side.SERVER) {
-		this.world.nonPlayerEntities.delete(UuidUtils.bytesToUuid(this.uuid));
-	}
+	this.world.removeEntity(this);
 	this.world = null;
 };
 
