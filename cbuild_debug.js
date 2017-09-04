@@ -10,6 +10,7 @@ const bfInst = new browserify('./client_main.js', {
 	paths: './',
 	debug: true
 });
+bfInst.exclude('winston');
 
 const walker = walk.walk('./server/', { followLinks: false });
 

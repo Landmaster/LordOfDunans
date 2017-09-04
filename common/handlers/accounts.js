@@ -9,7 +9,7 @@ const Player = require('common/player');
 const EmptyWorld = require('common/menu/empty_world');
 const sprintf = require('sprintf-js').sprintf;
 
-PacketHandler.register(0x0, Packet.loginPacket, (packet, mainInstance, ctx) => {
+PacketHandler.register(0x0000, Packet.loginPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.SERVER) {
 		const Accounts = require('server/accounts/accounts');
 		const AccountError = require('server/accounts/account_error');
@@ -27,7 +27,7 @@ PacketHandler.register(0x0, Packet.loginPacket, (packet, mainInstance, ctx) => {
 	}
 });
 
-PacketHandler.register(0x1, Packet.registerPacket, (packet, mainInstance, ctx) => {
+PacketHandler.register(0x0001, Packet.registerPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.SERVER) {
 		const Accounts = require('server/accounts/accounts');
 		const AccountError = require('server/accounts/account_error');
@@ -45,7 +45,7 @@ PacketHandler.register(0x1, Packet.registerPacket, (packet, mainInstance, ctx) =
 	}
 });
 
-PacketHandler.register(0x2, Packet.accountErrorPacket, (packet, mainInstance) => {
+PacketHandler.register(0x0002, Packet.accountErrorPacket, (packet, mainInstance) => {
 	if (Side.getSide() === Side.CLIENT) {
 		if (mainInstance.theWorld instanceof EmptyWorld) {
 			packet.locParams[0] = packet.locParams[0].toLocaleString();
@@ -55,7 +55,7 @@ PacketHandler.register(0x2, Packet.accountErrorPacket, (packet, mainInstance) =>
 	}
 });
 
-PacketHandler.register(0x3, Packet.accountSuccessPacket, (packet, mainInstance, ctx) => {
+PacketHandler.register(0x0003, Packet.accountSuccessPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT) {
 		mainInstance.setPlayer(new Player(mainInstance.theWorld, ctx.ws, mainInstance,
 			{uuid: new Uint8Array(packet.uuid.toBuffer()), uname: packet.uname}));
@@ -63,7 +63,7 @@ PacketHandler.register(0x3, Packet.accountSuccessPacket, (packet, mainInstance, 
 });
 
 // The logout packet is bidirectional.
-PacketHandler.register(0x4, Packet.logoutPacket, (packet, mainInstance, ctx) => {
+PacketHandler.register(0x0004, Packet.logoutPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT) {
 		mainInstance.setPlayer(null);
 	} else {

@@ -1,3 +1,6 @@
+/**
+ * @author Landmaster
+ */
 const walk = require('walk');
 const browserify = require('browserify');
 const fs = require('fs');
@@ -6,6 +9,7 @@ const UglifyJS = require("uglify-es");
 const bfInst = new browserify('./client_main.js', {
 	paths: './'
 });
+bfInst.exclude('winston');
 
 const walker = walk.walk('./server/', { followLinks: false });
 

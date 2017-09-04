@@ -124,7 +124,7 @@ PairingSet.prototype.hasPair = function (val, val1) {
  * @return {?Array.<T>} the pair, or {@code undefined} if the pair is nonexistent
  */
 PairingSet.prototype.getPair = function (val) {
-	if (this._map.hasElem(val)) {
+	if (this._map.has(val)) {
 		return this._map.get(val).slice(); // to prevent modification
 	}
 	return undefined;

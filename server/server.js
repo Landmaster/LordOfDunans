@@ -12,6 +12,8 @@ const PacketHandler = require('common/packethandler_registrar');
 const EventBus = require('eventbusjs');
 const PlayerDisconnectedEvent = require('common/events/player_disconnected');
 const PairingSet = require('common/algo/pairing_set');
+const Packet = require("common/lib/packet");
+const winston = require('winston');
 
 function Server(app, port, root, databaseFormat) {
 	this.expressWS = require('express-ws')(app);
@@ -103,7 +105,7 @@ function Server(app, port, root, databaseFormat) {
 	}, 30000);
 	
 	this.app.listen(port, () => {
-		console.log('Starting server on port ' + port);
+		winston.info('Starting server on port ' + port);
 	});
 }
 
@@ -137,14 +139,24 @@ Server.prototype.getPlayerFromWS = function getPlayerFromWS(ws) {
  */
 Server.prototype.removeClientByUUID = function removeClientByUUID(uuid) {
 	const uuidString = typeof uuid === 'string' ? uuid : UuidUtils.bytesToUuid(uuid);
+	const uuidBytes = typeof uuid === 'string' ? UuidUtils.uuidToBytes(uuid) : uuid;
 	const player = this.clientMap.get(uuidString);
 	if (player) {
 		player.despawn();
 		this.pendingPlayers.delete(player);
 		this.clientMap.delete(uuidString);
 		this.wsToUuidString.delete(player.ws);
-		this.pairedPlayers.deleteElem(player);
-		EventBus.dispatch(PlayerDisconnectedEvent.NAME, this, new PlayerDisconnectedEvent());
+		let pair = this.pairedPlayers.getPair(player);
+		if (pair) {
+			for (let pairElem of pair) {
+				if (pairElem === player) {
+					this.pairedPlayers.deleteElem(pairElem);
+				} else {
+					PacketHandler.sendToEndpoint(new Packet.opponentDisconnectedPacket(uuidBytes), pairElem.ws);
+				}
+			}
+		}
+		EventBus.dispatch(PlayerDisconnectedEvent.NAME, this, new PlayerDisconnectedEvent(uuidString));
 	}
 };
 

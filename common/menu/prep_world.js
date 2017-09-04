@@ -17,6 +17,16 @@ function PreparationWorld(mainInstance) {
 	World.call(this, mainInstance);
 	if (Side.getSide() === Side.CLIENT) {
 		this.initScene();
+		
+		/**
+		 * Match review HTML div.
+		 * @type {Element}
+		 */
+		this.matchReview = document.getElementById("match_review");
+		
+		this.htmlElementsToToggle.push(this.matchReview);
+		
+		this._updateMatchReview();
 	}
 }
 
@@ -45,15 +55,44 @@ if (Side.getSide() === Side.CLIENT) {
 		// lights on!
 		this.light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(-1, 1, 0), this.scene);
 		this.light.intensity = 0.5;
-		
-		this.matchReview = document.getElementById("match_review");
-		
-		this.htmlElementsToToggle.push(this.matchReview);
+	};
+	
+	/**
+	 * Updates the match review GUI with the players.
+	 * @private
+	 */
+	PreparationWorld.prototype._updateMatchReview = function () {
+		this.matchReview.innerHTML = ""; // reset the element
+		if (this.players.size >= 2) {
+			let counter = 0;
+			for (let player of this.players.values()) {
+				if (++counter > 2) break;
+				
+				let _playerBody = document.createElement("div");
+				_playerBody.classList.add("player_review");
+				
+				let _nameReview = document.createElement("h2");
+				_nameReview.classList.add("name_review");
+				_nameReview.textContent = player.uname;
+				_playerBody.appendChild(_nameReview);
+				
+				this.matchReview.appendChild(_playerBody); // Only append the element at the end, to minimize the amount of needed DOM updates.
+			}
+		} else {
+			let _loadingMeter = document.createElement("div");
+			_loadingMeter.classList.add("loading_meter");
+			
+			let _loadingCircle = document.createElement("img");
+			_loadingCircle.src = "/assets/images/loading.svg";
+			_loadingMeter.appendChild(_loadingCircle);
+			
+			this.matchReview.appendChild(_loadingMeter);
+		}
 	};
 	
 	const playerUpdateHandler = function (ev, data) {
 		if (data.world instanceof PreparationWorld) {
-			console.log(data.world.players);
+			data.world._updateMatchReview();
 		}
 	};
 	

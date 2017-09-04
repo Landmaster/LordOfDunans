@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">
+	<style type="text/css">
+		<![CDATA[
+		@keyframes rotate {
+			from { transform: rotate(0deg); }
+			to { transform: rotate(360deg); }
+		}
+		circle {
+			stroke: none;
+			fill: #fff;
+		}
+		#container {
+			animation: rotate 4s linear infinite;
+		}
+		]]>
+	</style>
+    <g transform="translate(128 128)"><g id="container"><g transform="translate(-128 -128)">
+        <circle cx="128" cy="32" r="32" />
+        <circle cx="195.882251" cy="60.117749" r="32" />
+        <circle cx="224" cy="128" r="32" />
+        <circle cx="195.882251" cy="195.882251" r="32" />
+        <circle cx="128" cy="224" r="32" />
+        <circle cx="60.117749" cy="195.882251" r="32" />
+        <circle cx="32" cy="128" r="32" />
+        <circle cx="60.117749" cy="60.117749" r="32" />
+	</g></g></g>
+</svg>

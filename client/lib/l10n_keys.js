@@ -28,5 +28,6 @@ String.toLocaleString({
 		$error_bad_password: 'Incorrect password',
 		$error_internal_server: 'Internal server error',
 		$error_timeout: 'Request timed out',
+		$error_opponent_disconnected: 'Opponent disconnected',
 	}
 });

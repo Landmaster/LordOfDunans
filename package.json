@@ -19,7 +19,8 @@
 		"typedarray-to-buffer": "^3.1.2",
 		"uuid": "git+https://github.com/kelektiv/node-uuid.git",
 		"vex-dialog": "latest",
-		"vex-js": "^3.1.1"
+		"vex-js": "^3.1.1",
+		"winston": "^2.3.1"
 	},
 	"devDependencies": {
 		"browserify": "^14.4.0",

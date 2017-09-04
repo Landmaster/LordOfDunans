@@ -2,6 +2,7 @@
 @import "vex-theme-os.css";
 
 @import "menu.css";
+@import "prep.css";
 
 html {
 	font-family: Lato, sans-serif;

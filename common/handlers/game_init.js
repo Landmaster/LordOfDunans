@@ -9,26 +9,26 @@ const Promise = require('bluebird');
 const EmptyWorld = require('common/menu/empty_world');
 const PreparationWorld = require('common/menu/prep_world');
 
-PacketHandler.register(0x9, Packet.playPacket, (packet, mainInstance, ctx) => {
+PacketHandler.register(0x0030, Packet.playPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.SERVER) {
+		const winston = require('winston');
 		const findRandomOpponent = require('server/algo/random_player');
 		
 		if (mainInstance.getUUIDFromWS(ctx.ws)) {
 			const player = mainInstance.getPlayerFromWS(ctx.ws);
-			console.log('Playing! '+player.uname);
+			winston.info(player.uname+' playing');
 			
 			findRandomOpponent(mainInstance, player, 5000)
 			.then((list) => {
 				PacketHandler.sendToEndpoint(new Packet.playListPacket(list), ctx.ws); // send the player data to the client
 			})
 			.catch(Promise.TimeoutError, e => {
-				console.log('Timed out');
 				PacketHandler.sendToEndpoint(new Packet.timeoutPacket(), ctx.ws);
 			});
 		}
 	}
 });
-PacketHandler.register(0xA, Packet.timeoutPacket, (packet, mainInstance, ctx) => {
+PacketHandler.register(0x0031, Packet.timeoutPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT) {
 		const newWorld = new EmptyWorld(mainInstance);
 		if (mainInstance.thePlayer) {
@@ -41,7 +41,7 @@ PacketHandler.register(0xA, Packet.timeoutPacket, (packet, mainInstance, ctx) =>
 		vex.dialog.alert('$error_timeout'.toLocaleString());
 	}
 });
-PacketHandler.register(0xB, Packet.playListPacket, (packet, mainInstance, ctx) => {
+PacketHandler.register(0x0032, Packet.playListPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT) {
 		for (let player of packet.getPlayers(mainInstance)) {
 			if (player !== mainInstance.thePlayer && mainInstance.theWorld instanceof PreparationWorld) {

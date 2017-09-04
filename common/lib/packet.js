@@ -226,7 +226,7 @@ Packet.playListPacket = function playListPacket(players) {
 	 * @type {ArrayBuffer}
 	 */
 	this._buf = _buf.toBuffer();
-}
+};
 Packet.playListPacket.prototype.deserialize = function (buf) {
 	this._buf = buf.toBuffer();
 };
@@ -247,6 +247,21 @@ Packet.playListPacket.prototype.getPlayers = function* (clientInstance) {
 			yield player;
 		}
 	}
+};
+
+/**
+ *
+ * @param byteUUID
+ * @constructor
+ */
+Packet.opponentDisconnectedPacket = function playerDisconnectedPacket(byteUUID) {
+	this.uuid = byteUUID;
+};
+Packet.opponentDisconnectedPacket.prototype.deserialize = function (buf) {
+	this.uuid = buf.readBytes(16);
+};
+Packet.opponentDisconnectedPacket.prototype.serialize = function (buf) {
+	buf.append(this.uuid);
 };
 
 
