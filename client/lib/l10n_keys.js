@@ -29,5 +29,7 @@ String.toLocaleString({
 		$error_internal_server: 'Internal server error',
 		$error_timeout: 'Request timed out',
 		$error_opponent_disconnected: 'Opponent disconnected',
+		
+		$character_landmaster: 'Landmaster',
 	}
 });

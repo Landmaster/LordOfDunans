@@ -1,4 +1,5 @@
 global.Promise = require('bluebird');
+require('buffer');
 
 const Dunans = require('client/dunans');
 

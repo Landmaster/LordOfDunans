@@ -33,12 +33,6 @@
 	font-size: 1.4em;
 }
 
-.clear_fix:after {
-	content: "";
-	display: table;
-	clear: both;
-}
-
 .login_error {
 	color: red;
 	font-weight: bold;

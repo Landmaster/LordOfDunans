@@ -85,7 +85,7 @@ World.prototype.removePlayer = function (player) {
  */
 World.prototype.load = function () {
 	if (Side.getSide() === Side.SERVER) {
-		this.loopID = gameloop.setGameLoop(delta => this.updateTick(delta), 1000 / 20);
+		this.loopID = gameloop.setGameLoop(delta => this.updateTick(delta), 1000 / World.TICKS_PER_SEC);
 	} else {
 		this.camera.attachControl(this.mainInstance.canvas, false);
 		const Loading = require('client/lib/dom/loading');
@@ -122,5 +122,7 @@ if (Side.getSide() === Side.CLIENT) {
 		++this.elapsedTicks;
 	};
 }
+
+World.TICKS_PER_SEC = 20;
 
 module.exports = World;

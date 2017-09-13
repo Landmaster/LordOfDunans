@@ -4,6 +4,11 @@
 
 const UuidUtils = require('./lib/uuid_utils');
 const Vec3 = require("./math/vec3.js");
+const BufferBSON = require('common/buffer/buffer_bson');
+const BSON = require("bson");
+const toBuffer = require('typedarray-to-buffer');
+
+let bson = new BSON();
 
 /**
  * Create a player
@@ -36,14 +41,17 @@ Player.prototype.despawn = function () {
 	this.world = null;
 };
 Player.prototype.serialize = function (buf) {
-	buf.append(this.uuid);
-	buf.writeVString(this.uname);
-	Vec3.toBuf(this.pos, buf);
+	BufferBSON.writeBSON(buf, {
+		uuid: new BSON.Binary(toBuffer(this.uuid), BSON.BSON_BINARY_SUBTYPE_UUID),
+		uname: this.uname,
+		pos: Vec3.toBSON(this.pos)
+	});
 };
 Player.prototype.deserialize = function (buf) {
-	this.uuid = new Uint8Array(buf.readBytes(16).toBuffer());
-	this.uname = buf.readVString();
-	this.pos = Vec3.fromBuf(buf);
+	let obj = BufferBSON.readBSON(buf);
+	this.uuid = new Uint8Array(obj.uuid.read(0, 16));
+	this.uname = obj.uname;
+	this.pos = Vec3.fromBSON(obj.pos);
 };
 
 module.exports = Player;

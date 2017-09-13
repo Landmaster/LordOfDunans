@@ -45,6 +45,7 @@ Vec3.prototype.toBabylon = function () {
 /**
  *
  * @param {ByteBuffer} buf
+ * @return {Vec3} the vector
  */
 Vec3.fromBuf = function (buf) {
 	return new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
@@ -58,4 +59,21 @@ Vec3.toBuf = function (vec, buf) {
 	buf.writeDouble(vec.y);
 	buf.writeDouble(vec.z);
 };
+/**
+ *
+ * @param object the BSON
+ * @return {Vec3} the vector
+ */
+Vec3.fromBSON = function (object) {
+	return new Vec3(object.x, object.y, object.z);
+};
+/**
+ *
+ * @param {Vec3} vec the vector
+ * @return {{x, y, z}} the BSON representation
+ */
+Vec3.toBSON = function (vec) {
+	return {x: vec.x, y: vec.y, z: vec.z};
+};
+
 module.exports = Vec3;

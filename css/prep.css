@@ -5,13 +5,12 @@
 	width: 90%;
 	height: 93%;
 	transform: translateX(-50%);
-	display: flex;
-	flex-direction: row;
-	flex-wrap: nowrap;
 }
 .player_review {
-	flex-grow: 1;
 	color: white;
+	float: left;
+	width: 50%;
+	height: 100%;
 }
 .name_review {
 	text-align: center;
@@ -25,4 +24,10 @@
 .loading_meter>img {
 	width: 7em;
 	height: 7em;
+}
+.character_selection {
+}
+.character_mark {
+	width: 20%;
+	height: auto;
 }

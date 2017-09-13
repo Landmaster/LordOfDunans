@@ -7,6 +7,7 @@ const Side = require('common/lib/side');
 const EventBus = require('eventbusjs');
 const PlayerAddedEvent = require('common/events/player_added');
 const PlayerRemovedEvent = require('common/events/player_removed');
+const CharacterRegistry = require("common/character_types/character_registry_default");
 
 /**
  * 
@@ -75,6 +76,21 @@ if (Side.getSide() === Side.CLIENT) {
 				_nameReview.classList.add("name_review");
 				_nameReview.textContent = player.uname;
 				_playerBody.appendChild(_nameReview);
+				
+				if (player === this.mainInstance.thePlayer) {
+					let _characterSelection = document.createElement("div");
+					_characterSelection.classList.add("character_selection");
+					
+					for (let [str, char] of CharacterRegistry.getEntries()) {
+						let _characterMark = document.createElement("img");
+						_characterMark.classList.add("character_mark");
+						_characterMark.src = char.avatarImage();
+						_characterMark.alt = ('$character_'+str).toLocaleString();
+						_characterSelection.appendChild(_characterMark);
+					}
+					
+					_playerBody.appendChild(_characterSelection);
+				}
 				
 				this.matchReview.appendChild(_playerBody); // Only append the element at the end, to minimize the amount of needed DOM updates.
 			}
