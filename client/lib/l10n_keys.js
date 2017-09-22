@@ -15,6 +15,8 @@ String.toLocaleString({
 		$gui_back: 'Back',
 		$gui_logout: 'Logout',
 		
+		$prompt_choose_character: 'Choose your main',
+		
 		$data_username: 'Username',
 		$data_password: 'Password',
 		$data_password_confirm: 'Confirm Password',
@@ -29,7 +31,13 @@ String.toLocaleString({
 		$error_internal_server: 'Internal server error',
 		$error_timeout: 'Request timed out',
 		$error_opponent_disconnected: 'Opponent disconnected',
+		$error_user_already_logged: 'User ‘%s’ is already logged on',
 		
 		$character_landmaster: 'Landmaster',
+		
+		$prep_chosen_character: 'Chosen character: %s',
+		
+		$image_start: '/assets/images/start/en_us.svg',
+		$image_start_desc: 'Start',
 	}
 });

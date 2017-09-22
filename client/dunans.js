@@ -52,6 +52,10 @@ function Dunans() {
 
 	this.theWorld = null;
 	
+	/**
+	 *
+	 * @type {?Player}
+	 */
 	this.thePlayer = null;
 
 	this.setWorld(new EmptyWorld(this));

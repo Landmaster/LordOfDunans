@@ -1,6 +1,6 @@
 /**
  *
- * @type {Map.<String, CharacterTypeBase>}
+ * @type {Map.<string, CharacterTypeBase>}
  * @private
  */
 const _characterMap = new Map();
@@ -10,12 +10,19 @@ const _characterMap = new Map();
  */
 const CharacterRegistry = {};
 
-CharacterRegistry.register = function (key, ctb) {
-	_characterMap.set(key, ctb);
+CharacterRegistry.register = function (ctb) {
+	_characterMap.set(ctb.identifier, ctb);
 };
-CharacterRegistry.getCharacterType = function (key) {
-	return _characterMap.get(key);
+CharacterRegistry.getCharacterType = function (identifier) {
+	return _characterMap.get(identifier);
 };
+CharacterRegistry.getCharacterIdentifier = function (ctb) {
+	return ctb.identifier;
+};
+/**
+ *
+ * @return {Iterator.<Array>}
+ */
 CharacterRegistry.getEntries = function () {
 	return _characterMap.entries();
 };

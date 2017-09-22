@@ -115,6 +115,7 @@ if (Side.getSide() === Side.CLIENT) {
 
 	World.prototype.render = function () {
 		this.nonPlayerEntities.forEach(entity => entity.render());
+		this.players.forEach(player => player.render());
 		this.scene.render();
 	};
 } else {

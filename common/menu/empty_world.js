@@ -9,6 +9,11 @@ const Side = require('common/lib/side');
 const World = require('common/world');
 const Packet = require('common/lib/packet');
 
+const CharacterTypeBase = require('common/character_types/character_type_base');
+
+const EventBus = require('eventbusjs');
+const PlayerAddedEvent = require('common/events/player_added');
+
 /**
  * The empty world, used for the title screen.
  * @param {Server|Dunans} mainInstance the server/client instance
@@ -101,15 +106,15 @@ if (Side.getSide() === Side.CLIENT) {
 		const escapeHtml = require('client/lib/dom/escape_html');
 		vex.dialog.open({
 			unsafeMessage: [
-				(isRegister ? '$gui_register' : '$gui_login').toLocaleString()
+				escapeHtml((isRegister ? '$gui_register' : '$gui_login').toLocaleString())
 			].concat(this.loginErrors.map(
 				error => sprintf('<span class="login_error">%s</span>', escapeHtml(error)))
 			).join('<br />'),
 			input: [
-				sprintf('<input name="uname" type="text" placeholder="%s" required />', "$data_username".toLocaleString()),
-				sprintf('<input name="pword" type="password" placeholder="%s" required />', "$data_password".toLocaleString())
+				sprintf('<input name="uname" type="text" placeholder="%s" required />', escapeHtml("$data_username".toLocaleString())),
+				sprintf('<input name="pword" type="password" placeholder="%s" required />', escapeHtml("$data_password".toLocaleString()))
 			].concat(isRegister ? [
-				sprintf('<input name="pword_conf" type="password" placeholder="%s" required />', "$data_password_confirm".toLocaleString())
+				sprintf('<input name="pword_conf" type="password" placeholder="%s" required />', escapeHtml("$data_password_confirm".toLocaleString()))
 			] : []).join('\n'),
 			buttons: [
 				Object.assign({}, vex.dialog.buttons.YES, { text: (isRegister ? '$gui_register' : '$gui_login').toLocaleString() }),
@@ -209,6 +214,16 @@ if (Side.getSide() === Side.CLIENT) {
 			this.lampGlass.forEach(glass => glass.rotation.y = (this.mainInstance.frame * -0.009) % (2 * Math.PI));
 		}
 	};
+	
+	const playerUpdateHandler = function (ev, data) {
+		if (data.world instanceof EmptyWorld) {
+			if (data instanceof PlayerAddedEvent) {
+				data.player.setCharacterType(CharacterTypeBase.EMPTY);
+			}
+		}
+	};
+	
+	EventBus.addEventListener(PlayerAddedEvent.NAME, playerUpdateHandler);
 }
 
 module.exports = EmptyWorld;

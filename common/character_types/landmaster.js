@@ -1,5 +1,5 @@
 const CharacterTypeBase = require('./character_type_base');
-const Side = require('common/lib/side');
+//const Side = require('common/lib/side');
 
 /**
  * Yours truly.
@@ -7,7 +7,7 @@ const Side = require('common/lib/side');
  * @constructor
  */
 function CharacterLandmaster() {
-	CharacterTypeBase.call(this);
+	CharacterTypeBase.call(this, 'landmaster');
 }
 CharacterLandmaster.prototype = Object.create(CharacterTypeBase.prototype, {
 	constructor: {
@@ -16,11 +16,5 @@ CharacterLandmaster.prototype = Object.create(CharacterTypeBase.prototype, {
 		configurable: true
 	}
 });
-
-if (Side.getSide() === Side.CLIENT) {
-	CharacterTypeBase.prototype.avatarImage = function () {
-		return "/assets/images/character_avatars/landmaster.png"; // defaults to Landmaster's
-	}
-}
 
 module.exports = CharacterLandmaster;

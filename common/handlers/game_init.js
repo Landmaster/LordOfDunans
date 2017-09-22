@@ -8,6 +8,7 @@ const Side = require('common/lib/side');
 const Promise = require('bluebird');
 const EmptyWorld = require('common/menu/empty_world');
 const PreparationWorld = require('common/menu/prep_world');
+const CharacterRegistry = require("common/character_registry");
 
 PacketHandler.register(0x0030, Packet.playPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.SERVER) {
@@ -16,15 +17,18 @@ PacketHandler.register(0x0030, Packet.playPacket, (packet, mainInstance, ctx) =>
 		
 		if (mainInstance.getUUIDFromWS(ctx.ws)) {
 			const player = mainInstance.getPlayerFromWS(ctx.ws);
-			winston.info(player.uname+' playing');
 			
-			findRandomOpponent(mainInstance, player, 5000)
-			.then((list) => {
-				PacketHandler.sendToEndpoint(new Packet.playListPacket(list), ctx.ws); // send the player data to the client
-			})
-			.catch(Promise.TimeoutError, e => {
-				PacketHandler.sendToEndpoint(new Packet.timeoutPacket(), ctx.ws);
-			});
+			if (player.world instanceof EmptyWorld) {
+				winston.info(player.uname + ' playing');
+				
+				findRandomOpponent(mainInstance, player, 30000)
+				.then((list) => {
+					PacketHandler.sendToEndpoint(new Packet.playListPacket(list), ctx.ws); // send the player data to the client
+				})
+				.catch(Promise.TimeoutError, e => {
+					PacketHandler.sendToEndpoint(new Packet.timeoutPacket(), ctx.ws);
+				});
+			}
 		}
 	}
 });
@@ -43,10 +47,24 @@ PacketHandler.register(0x0031, Packet.timeoutPacket, (packet, mainInstance, ctx)
 });
 PacketHandler.register(0x0032, Packet.playListPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT) {
-		for (let player of packet.getPlayers(mainInstance)) {
-			if (player !== mainInstance.thePlayer && mainInstance.theWorld instanceof PreparationWorld) {
+		if (mainInstance.theWorld instanceof PreparationWorld) {
+			for (let player of packet.getPlayers(mainInstance)) {
+				if (player === mainInstance.thePlayer) {
+					player.despawn();
+				}
 				player.spawn(mainInstance.theWorld);
 			}
 		}
+	}
+});
+PacketHandler.register(0x0033, Packet.setCharacterTypePacket, (packet, mainInstance, ctx) => {
+	if (Side.getSide() === Side.SERVER) {
+		const player = mainInstance.getPlayerFromWS(ctx.ws);
+		if (player.world instanceof PreparationWorld) {
+			player.setCharacterType(CharacterRegistry.getCharacterType(packet.characterIdentifier));
+		}
+		PacketHandler.sendToEndpoint(packet, ctx.ws); // send back the packet
+	} else {
+		mainInstance.thePlayer.setCharacterType(CharacterRegistry.getCharacterType(packet.characterIdentifier));
 	}
 });

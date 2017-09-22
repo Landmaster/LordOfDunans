@@ -14,6 +14,7 @@ const PlayerDisconnectedEvent = require('common/events/player_disconnected');
 const PairingSet = require('common/algo/pairing_set');
 const Packet = require("common/lib/packet");
 const winston = require('winston');
+const AccountError = require('server/accounts/account_error');
 
 function Server(app, port, root, databaseFormat) {
 	this.expressWS = require('express-ws')(app);
@@ -115,6 +116,9 @@ function Server(app, port, root, databaseFormat) {
  */
 Server.prototype.addClient = function addClient(client) {
 	const uuidString = UuidUtils.bytesToUuid(client.uuid);
+	if (this.clientMap.has(uuidString)) {
+		throw new AccountError('$error_user_already_logged', client.uname);
+	}
 	this.clientMap.set(uuidString, client);
 	this.wsToUuidString.set(client.ws, uuidString);
 	client.spawn(client.world);
@@ -124,6 +128,11 @@ Server.prototype.getUUIDFromWS = function getUUIDFromWS(ws) {
 	return this.wsToUuidString.get(ws);
 };
 
+/**
+ *
+ * @param ws the websocket
+ * @return {?Player} the player
+ */
 Server.prototype.getPlayerFromWS = function getPlayerFromWS(ws) {
 	const uuidString = this.getUUIDFromWS(ws);
 	if (uuidString) {

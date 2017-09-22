@@ -2,6 +2,7 @@ const Promise = require('bluebird');
 const defer = require('common/lib/deferred');
 const PreparationWorld = require('common/menu/prep_world');
 const EmptyWorld = require('common/menu/empty_world');
+const Vec3 = require('common/math/vec3');
 
 /**
  * Search for a random opponent.
@@ -16,6 +17,8 @@ function findRandomOpponent(server, player, timeout) {
 			let arr = [player, pendingPlayer];
 			player.despawn();
 			player.spawn(pendingPlayer.world);
+			player.setPositionAndUpdate(new Vec3(0, 0, -7));
+			
 			server.pendingPlayers.delete(pendingPlayer);
 			server.pairedPlayers.addPair(...arr);
 			pendingDfd.resolve(arr);
@@ -26,6 +29,7 @@ function findRandomOpponent(server, player, timeout) {
 	server.pendingPlayers.set(player, df);
 	player.despawn();
 	player.spawn(new PreparationWorld(server));
+	player.setPositionAndUpdate(new Vec3(0, 0, 7));
 	
 	return df.promise.timeout(timeout).catch(Promise.TimeoutError, e => {
 		server.pendingPlayers.delete(player);
