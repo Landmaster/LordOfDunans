@@ -22,8 +22,6 @@ const PlayerAddedEvent = require('common/events/player_added');
 function EmptyWorld(mainInstance) {
 	World.call(this, mainInstance);
 	if (Side.getSide() === Side.CLIENT) {
-		this.initScene();
-		
 		/**
 		 * @type {Array.<string>}
 		 */
@@ -139,6 +137,8 @@ if (Side.getSide() === Side.CLIENT) {
 	};
 	
 	EmptyWorld.prototype.initScene = function () {
+		World.prototype.initScene.call(this);
+		
 		const BABYLON = require('babylonjs');
 		
 		// setup camera

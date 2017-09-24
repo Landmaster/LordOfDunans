@@ -28,13 +28,10 @@ function World(mainInstance) {
 		 */
 		this.initialFrame = this.mainInstance.frame;
 		
-		/**
-		 * @type {BABYLON.Scene}
-		 */
-		this.scene = new BABYLON.Scene(this.mainInstance.engine);
-		this.scene.clearColor = new BABYLON.Color4(0,0,0);
-
-		this.camera = new BABYLON.TargetCamera('camera', new BABYLON.Vector3(0,0,0), this.scene);
+		this.scene = null;
+		this.renderManager = null;
+		
+		this.camera = null;
 		
 		/**
 		 * Stores the HTML DOM elements to toggle display on load/unload. The array elements
@@ -87,6 +84,7 @@ World.prototype.load = function () {
 	if (Side.getSide() === Side.SERVER) {
 		this.loopID = gameloop.setGameLoop(delta => this.updateTick(delta), 1000 / World.TICKS_PER_SEC);
 	} else {
+		this.initScene();
 		this.camera.attachControl(this.mainInstance.canvas, false);
 		const Loading = require('client/lib/dom/loading');
 		this.htmlElementsToToggle.forEach(Loading.load);
@@ -103,12 +101,26 @@ World.prototype.unload = function () {
 		this.camera.detachControl(this.mainInstance.canvas);
 		const Loading = require('client/lib/dom/loading');
 		this.htmlElementsToToggle.forEach(Loading.unload);
+		this.scene.dispose();
+		this.scene = null;
 	}
 	this.players = new Map();
 	this.nonPlayerEntities = new Map();
 };
 
 if (Side.getSide() === Side.CLIENT) {
+	const BABYLON = require('babylonjs');
+	const RenderManager = require('client/lib/render/render_manager');
+	
+	World.prototype.initScene = function () {
+		this.scene = new BABYLON.Scene(this.mainInstance.engine);
+		this.scene.clearColor = new BABYLON.Color4(0,0,0);
+		
+		this.renderManager = new RenderManager(this.scene);
+		
+		this.camera = new BABYLON.TargetCamera('camera', new BABYLON.Vector3(0,0,0), this.scene);
+	};
+	
 	World.prototype.animate = function () {
 		this.nonPlayerEntities.forEach(entity => entity.animate());
 	};
@@ -116,7 +128,7 @@ if (Side.getSide() === Side.CLIENT) {
 	World.prototype.render = function () {
 		this.nonPlayerEntities.forEach(entity => entity.render());
 		this.players.forEach(player => player.render());
-		this.scene.render();
+		if (this.scene) this.scene.render();
 	};
 } else {
 	World.prototype.updateTick = function (delta) {

@@ -64,27 +64,32 @@ function Player(world, ws, mainInstance, options) {
 	this.characterType = CharacterTypeBase.EMPTY;
 	
 	if (Side.getSide() === Side.CLIENT) {
-		/**
-		 *
-		 * @type {Promise}
-		 */
-		this.modelPromise = Promise.resolve(null);
-		this._updateModelPromise();
+		this.playerMesh = null;
 	}
 }
 Player.prototype.spawn = function (world) {
 	this.world = world;
 	this.world.addPlayer(this);
-	if (Side.getSide() === Side.CLIENT) this._updateModelPromise();
 };
 Player.prototype.despawn = function () {
 	this.world.removePlayer(this);
 	this.world = null;
-	if (Side.getSide() === Side.CLIENT) this._updateModelPromise();
 };
 Player.prototype.setCharacterType = function (type) {
 	this.characterType = type;
-	if (Side.getSide() === Side.CLIENT) this._updateModelPromise();
+	if (Side.getSide() === Side.CLIENT) {
+		if (this.playerMesh && this.playerMesh.getScene().getEngine()) {
+			this.playerMesh.dispose();
+			this.playerMesh = null;
+		}
+		
+		this.characterType.modelPromise(this.mainInstance).spread(meshes => {
+			if (meshes && meshes[0]) {
+				this.playerMesh = meshes[0].clone('player_model_'+UuidUtils.bytesToUuid(this.uuid));
+				this.playerMesh.isVisible = true;
+			}
+		});
+	}
 	EventBus.dispatch(SetCharacterTypeEvent.NAME, this, new SetCharacterTypeEvent(this));
 };
 
@@ -112,20 +117,9 @@ Player.prototype.setPositionAndUpdate = function (pos) {
 
 if (Side.getSide() === Side.CLIENT) {
 	Player.prototype.render = function () {
-		Promise.any([this.modelPromise, Promise.resolve(null)]).then((meshes) => {
-			if (meshes) {
-				meshes[0].position = this.pos.toBabylon();
-			}
-		});
-	};
-	
-	Player.prototype._updateModelPromise = function () {
-		Promise.any([this.modelPromise, Promise.resolve(null)]).then((meshes) => {
-			if (meshes) {
-				meshes[0].dispose();
-			}
-		});
-		this.modelPromise = this.world ? this.characterType.modelPromise(this.world.scene) : Promise.resolve(null);
+		if (this.playerMesh) {
+			this.playerMesh.position = this.pos.toBabylon();
+		}
 	};
 }
 

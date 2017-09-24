@@ -17,6 +17,8 @@ function CharacterTypeBase(identifier) {
 }
 
 if (Side.getSide() === Side.CLIENT) {
+	const BABYLON = require('babylonjs');
+	
 	CharacterTypeBase.prototype.avatarImage = function () {
 		return this.identifier ? "/assets/images/character_avatars/"+this.identifier+".png" : "";
 	};
@@ -25,15 +27,11 @@ if (Side.getSide() === Side.CLIENT) {
 		return this.identifier ? this.identifier+'.babylon' : '';
 	};
 	
-	CharacterTypeBase.prototype.modelPromise = function (scene) {
-		const BABYLON = require('babylonjs');
-		
+	CharacterTypeBase.prototype.modelPromise = function (mainInstance) {
 		let model = this.model();
-		return model ? new Promise((res, rej) => {
-			BABYLON.SceneLoader.ImportMesh(this.identifier,
-				'/assets/models/characters/', model,
-				scene, res, undefined, rej);
-		}) : Promise.resolve(null);
+		return model && mainInstance.theWorld.renderManager ?
+			mainInstance.theWorld.renderManager.loadModel(this.identifier, '/assets/models/characters/', model)
+			: Promise.resolve([]);
 	}
 }
 

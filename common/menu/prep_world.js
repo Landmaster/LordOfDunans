@@ -22,8 +22,6 @@ const sp = require('sprintf-js');
 function PreparationWorld(mainInstance) {
 	World.call(this, mainInstance);
 	if (Side.getSide() === Side.CLIENT) {
-		this.initScene();
-		
 		/**
 		 * Match review HTML div.
 		 * @type {Element}
@@ -46,6 +44,8 @@ PreparationWorld.prototype = Object.create(World.prototype, {
 
 if (Side.getSide() === Side.CLIENT) {
 	PreparationWorld.prototype.initScene = function () {
+		World.prototype.initScene.call(this);
+		
 		const BABYLON = require('babylonjs');
 		
 		// setup camera

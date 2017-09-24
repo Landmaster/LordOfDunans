@@ -2,6 +2,11 @@ const v4 = require('uuid/v4');
 const Side = require('./lib/side');
 const Vec3 = require('./math/vec3');
 const UuidUtils = require('./lib/uuid_utils');
+const BSON = require('bson');
+const BufferBSON = require('common/buffer/buffer_bson');
+const toBuffer = require('typedarray-to-buffer');
+
+let bson = new BSON();
 
 function Entity(world) {
 	this.world = world;
@@ -11,13 +16,30 @@ function Entity(world) {
 	this.pos = Vec3.zero();
 }
 
+/**
+ * For each tower class, set this property to {@code true}.
+ * @type {boolean}
+ */
+Entity.prototype.isTower = false;
+
+/**
+ * Deserialize an entity.
+ * @param buf
+ */
 Entity.prototype.deserialize = function (buf) {
-	this.pos.deserialize(buf);
-	this.uuid = buf.readBytes(16);
+	let obj = BufferBSON.readBSON(buf);
+	this.uuid = new Uint8Array(obj.uuid.read(0, 16));
+	this.pos = Vec3.fromBSON(obj.pos);
 };
+/**
+ * Serialize an entity.
+ * @param buf
+ */
 Entity.prototype.serialize = function (buf) {
-	this.pos.serialize(buf);
-	buf.append(this.uuid);
+	BufferBSON.writeBSON(buf, {
+		uuid: new BSON.Binary(toBuffer(this.uuid), BSON.BSON_BINARY_SUBTYPE_UUID),
+		pos: Vec3.toBSON(this.pos)
+	});
 };
 
 /**
@@ -38,6 +60,12 @@ Entity.prototype.hitBox = function() {
 };
 
 if (Side.getSide() === Side.CLIENT) {
+	/**
+	 * The icon of the entity, if it is a tower.
+	 * @type {string}
+	 */
+	Entity.prototype.towerIcon = "";
+	
 	Entity.prototype.animate = function () {
 	};
 

@@ -15,6 +15,7 @@ const PairingSet = require('common/algo/pairing_set');
 const Packet = require("common/lib/packet");
 const winston = require('winston');
 const AccountError = require('server/accounts/account_error');
+const EmptyWorld = require('common/menu/empty_world');
 
 function Server(app, port, root, databaseFormat) {
 	this.expressWS = require('express-ws')(app);
@@ -161,6 +162,9 @@ Server.prototype.removeClientByUUID = function removeClientByUUID(uuid) {
 				if (pairElem === player) {
 					this.pairedPlayers.deleteElem(pairElem);
 				} else {
+					let newWorld = new EmptyWorld(this);
+					pairElem.despawn();
+					pairElem.spawn(newWorld);
 					PacketHandler.sendToEndpoint(new Packet.opponentDisconnectedPacket(uuidBytes), pairElem.ws);
 				}
 			}
