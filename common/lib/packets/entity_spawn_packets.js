@@ -14,20 +14,17 @@ const Packet = {};
  */
 Packet.entitySpawnedPacket = function entitySpawnedPacket(entity, byteUUID) {
 	if (arguments.length > 0) {
-		this.uuid = byteUUID;
-		this.entityID = EntityRegistry.entityToID(entity);
+		this.entityID = EntityRegistry.entityClassToId(entity.constructor);
 		this.entityBuf = new ByteBuffer();
 		entity.serialize(this.entityBuf); // write the entity to the buffer
 	}
 };
 Packet.entitySpawnedPacket.prototype.deserialize = function (buf) {
-	this.uuid = buf.readBytes(16);
-	this.entityID = buf.readShort();
+	this.entityID = buf.readVString();
 	this.entityBuf = buf;
 };
 Packet.entitySpawnedPacket.prototype.serialize = function (buf) {
-	buf.append(this.uuid);
-	buf.writeShort(this.entityID);
+	buf.writeVString(this.entityID);
 	buf.append(this.entityBuf);
 };
 Packet.entitySpawnedPacket.prototype.newEntity = function (world) {

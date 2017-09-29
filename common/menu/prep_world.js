@@ -8,11 +8,13 @@ const EventBus = require('eventbusjs');
 const PlayerAddedEvent = require('common/events/player_added');
 const PlayerRemovedEvent = require('common/events/player_removed');
 const SetCharacterTypeEvent = require('common/events/set_character_type');
+const SetChosenTowersEvent = require('common/events/set_chosen_towers');
 const CharacterRegistry = require('common/character_types/character_registry_default');
 const CharacterTypeBase = require('common/character_types/character_type_base');
 const UuidUtils = require("common/lib/uuid_utils");
 const Packet = require("common/lib/packet");
 const sp = require('sprintf-js');
+const EntityRegistry = require('common/entities/entity_registry_default');
 
 /**
  * 
@@ -110,6 +112,31 @@ if (Side.getSide() === Side.CLIENT) {
 					}
 					
 					_playerBody.appendChild(_characterSelection);
+					
+					let _towerHeader = document.createElement("p");
+					_towerHeader.classList.add("tower_header");
+					_towerHeader.textContent = "$prep_tower".toLocaleString();
+					_playerBody.appendChild(_towerHeader);
+					
+					let _towerSelection = document.createElement("div");
+					_towerSelection.classList.add("tower_selection");
+					
+					for (let towerClass of EntityRegistry.getTowers()) {
+						const id = EntityRegistry.entityClassToId(towerClass);
+						
+						let _towerMark = document.createElement("div");
+						_towerMark.dataset.tower = id;
+						_towerMark.classList.add("tower_mark");
+						_towerMark.style.backgroundImage = 'url("'+encodeURI(towerClass.prototype.towerIcon)+'")';
+						_towerMark.style.backgroundSize = "contain";
+						_towerMark.addEventListener("click", () => {
+							this.mainInstance.sendToServer(new Packet.setTowerPacket(
+								this.mainInstance.thePlayer.uuid, towerClass));
+						});
+						_towerSelection.appendChild(_towerMark);
+					}
+					
+					_playerBody.appendChild(_towerSelection);
 				}
 				
 				this.matchReview.appendChild(_playerBody); // Only append the element at the end, to minimize the amount of needed DOM updates.
@@ -165,17 +192,30 @@ if (Side.getSide() === Side.CLIENT) {
 		}
 	};
 	
-	const playerUpdateHandler = function (ev, data) {
-		if (data.world instanceof PreparationWorld) {
-			if (data instanceof PlayerAddedEvent) {
-				data.player.setCharacterType(CharacterTypeBase.EMPTY);
+	PreparationWorld.prototype._updateChosenTowers = function () {
+		const escapeHtml = require('client/lib/dom/escape_html');
+		
+		let uuidString = UuidUtils.bytesToUuid(this.mainInstance.thePlayer.uuid);
+		let _playerBodies = document.getElementsByClassName('player_review');
+		
+		for (let _playerBody of _playerBodies) {
+			if (_playerBody.dataset.player === uuidString) {
+				let _towerMarks = _playerBody.getElementsByClassName('tower_mark');
+				for (let _towerMark of _towerMarks) {
+					let _towerClass = EntityRegistry.entityClassFromId(_towerMark.dataset.tower);
+					let idx = this.mainInstance.thePlayer.chosenTowers.indexOf(_towerClass);
+					
+					if (idx >= 0) {
+						_towerMark.classList.add('chosen');
+						_towerMark.dataset.index = idx+1;
+					} else {
+						_towerMark.classList.remove('chosen');
+						delete _towerMark.dataset.index;
+					}
+				}
 			}
-			data.world._updateMatchReview();
 		}
 	};
-	
-	EventBus.addEventListener(PlayerAddedEvent.NAME, playerUpdateHandler);
-	EventBus.addEventListener(PlayerRemovedEvent.NAME, playerUpdateHandler);
 	
 	EventBus.addEventListener(SetCharacterTypeEvent.NAME, (ev, data) => {
 		if (data.player.world instanceof PreparationWorld) {
@@ -184,6 +224,30 @@ if (Side.getSide() === Side.CLIENT) {
 			}
 		}
 	});
-}
+	
+	EventBus.addEventListener(SetChosenTowersEvent.NAME, (ev, data) => {
+		if (data.player.world instanceof PreparationWorld) {
+			if (data.player === data.player.mainInstance.thePlayer) {
+				data.player.world._updateChosenTowers();
+			}
+		}
+	});
+} // #END Side.getSide() === Side.CLIENT
+
+
+const playerUpdateHandler = function (ev, data) {
+	if (data.world instanceof PreparationWorld) {
+		if (data instanceof PlayerAddedEvent) {
+			data.player.setCharacterType(CharacterTypeBase.EMPTY);
+			data.player.clearChosenTowers();
+		}
+		if (Side.getSide() === Side.CLIENT) {
+			data.world._updateMatchReview();
+		}
+	}
+};
+
+EventBus.addEventListener(PlayerAddedEvent.NAME, playerUpdateHandler);
+EventBus.addEventListener(PlayerRemovedEvent.NAME, playerUpdateHandler);
 
 module.exports = PreparationWorld;

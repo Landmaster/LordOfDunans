@@ -14,6 +14,8 @@ const SetCharacterTypeEvent = require("./events/set_character_type");
 const Side = require("./lib/side");
 const PacketHandler = require("./lib/packethandler");
 const Packet = require("./lib/packet");
+const EntityRegistry = require("common/entity_registry");
+const SetChosenTowersEvent = require("./events/set_chosen_towers");
 
 let bson = new BSON();
 
@@ -63,10 +65,18 @@ function Player(world, ws, mainInstance, options) {
 	 */
 	this.characterType = CharacterTypeBase.EMPTY;
 	
+	/**
+	 *
+	 * @type {Array.<Function>}
+	 */
+	this.chosenTowers = new Array(EntityRegistry.TOWERS_PER_PLAYER);
+	
 	if (Side.getSide() === Side.CLIENT) {
 		this.playerMesh = null;
 	}
 }
+
+
 Player.prototype.spawn = function (world) {
 	this.world = world;
 	this.world.addPlayer(this);
@@ -93,6 +103,29 @@ Player.prototype.setCharacterType = function (type) {
 	EventBus.dispatch(SetCharacterTypeEvent.NAME, this, new SetCharacterTypeEvent(this));
 };
 
+Player.prototype.clearChosenTowers = function () {
+	this.chosenTowers = new Array(EntityRegistry.TOWERS_PER_PLAYER);
+	EventBus.dispatch(SetChosenTowersEvent.NAME, this, new SetChosenTowersEvent(this));
+};
+Player.prototype.toggleChosenTower = function (towerClass) {
+	let idx = this.chosenTowers.indexOf(towerClass);
+	if (idx >= 0) {
+		this.chosenTowers[idx] = null;
+	} else {
+		for (let i=0; i<this.chosenTowers.length; ++i) {
+			if (!this.chosenTowers[i]) {
+				this.chosenTowers[i] = towerClass;
+				break;
+			}
+		}
+	}
+	EventBus.dispatch(SetChosenTowersEvent.NAME, this, new SetChosenTowersEvent(this));
+};
+Player.prototype.setChosenTowers = function (towers) {
+	this.chosenTowers = [...towers];
+	this.chosenTowers.length = EntityRegistry.TOWERS_PER_PLAYER;
+	EventBus.dispatch(SetChosenTowersEvent.NAME, this, new SetChosenTowersEvent(this));
+};
 
 Player.prototype.serialize = function (buf) {
 	BufferBSON.writeBSON(buf, {

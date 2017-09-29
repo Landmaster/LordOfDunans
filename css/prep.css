@@ -30,6 +30,7 @@
 	height: 7em;
 }
 .character_selection {
+	/* nothing yet */
 }
 .character_mark {
 	width: 25%;
@@ -40,8 +41,8 @@
 	box-shadow: 0 0 5px 5px rgba(255, 255, 0, 0.2);
 }
 .start_button {
-	position: fixed;
-	top: 84%;
+	position: absolute;
+	top: 100%;
 	left: 50%;
 	width: 13em;
 	height: auto;
@@ -53,4 +54,37 @@
 }
 .chosen_character_display {
 	color: #8bee22;
+}
+.tower_selection {
+	/* nothing yet */
+}
+.tower_mark {
+	display: inline-block;
+	width: 12.5%;
+	padding-top: 12.5%;
+	cursor: pointer;
+	position: relative; /* used so that the ::before element can be positioned relative to this */
+	
+	/* Hide the text. */
+	text-indent: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+}
+.tower_mark.chosen::before {
+	content: attr(data-index);
+	color: transparent;
+	text-shadow: 0 0 3px #fff;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 2.8em;
+	
+	/* Reshow text. */
+	text-indent: 0;
+	white-space: normal;
+	overflow: visible;
+}
+.tower_mark.chosen {
+	box-shadow: 0 0 5px 5px rgba(0, 255, 164, 0.2);
 }

@@ -5,6 +5,8 @@
 const UuidUtils = require('common/lib/uuid_utils');
 const ByteBuffer = require('bytebuffer');
 
+const EntityRegistry = require('common/entity_registry');
+
 const Packet = {};
 
 // Sent to the server to play a game.
@@ -75,5 +77,49 @@ Packet.setCharacterTypePacket.prototype.serialize = function (buf) {
 	buf.append(this.uuid);
 	buf.writeVString(this.characterIdentifier);
 };
+
+Packet.setTowerPacket = function setTowerPacket(playerUUID, tower) {
+	this.uuid = playerUUID;
+	this.tower = tower;
+};
+Packet.setTowerPacket.prototype.deserialize = function (buf) {
+	this.uuid = buf.readBytes(16);
+	this.tower = EntityRegistry.entityClassFromId(buf.readVString());
+};
+Packet.setTowerPacket.prototype.serialize = function (buf) {
+	buf.append(this.uuid);
+	buf.writeVString(EntityRegistry.entityClassToId(this.tower));
+};
+
+Packet.setAllTowersPacket = function setAllTowersPacket(playerUUID, ...towers) {
+	this.uuid = playerUUID;
+	this.towers = towers;
+};
+Packet.setAllTowersPacket.prototype.deserialize = function (buf) {
+	this.uuid = buf.readBytes(16);
+	
+	let len = buf.readVarint32();
+	this.towers = new Array(len);
+	
+	for (let i=0; i<len; ++i) {
+		if (buf.readByte()) {
+			this.towers[i] = EntityRegistry.entityClassFromId(buf.readVString());
+		}
+	}
+};
+Packet.setAllTowersPacket.prototype.serialize = function (buf) {
+	buf.append(this.uuid);
+	buf.writeVarint32(this.towers.length);
+	
+	for (let i=0; i<this.towers.length; ++i) {
+		if (this.towers[i]) {
+			buf.writeByte(1);
+			buf.writeVString(EntityRegistry.entityClassToId(this.towers[i]));
+		} else {
+			buf.writeByte(0);
+		}
+	}
+};
+
 
 module.exports = Packet;

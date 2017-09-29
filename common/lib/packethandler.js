@@ -98,9 +98,14 @@ PacketHandler.stream = function stream(packetObj) {
  * Send a message to a specific endpoint.
  * @param {Object} message the message
  * @param {WebSocket} ws the WebSocket endpoint
+ * @return whether sending was successful
  */
 PacketHandler.sendToEndpoint = function sendToEndpoint (message, ws) {
-	ws.send(PacketHandler.stream(message));
+	if (ws.readyState === 1/* OPEN */) {
+		ws.send(PacketHandler.stream(message));
+		return true;
+	}
+	return false;
 };
 
 module.exports = PacketHandler;

@@ -112,8 +112,7 @@ Dunans.prototype.setPlayer = function setPlayer(player) {
 };
 
 Dunans.prototype.sendToServer = function sendToServer(message, noPush) {
-	if (this.ws) {
-		this.ws.send(PacketHandler.stream(message));
+	if (PacketHandler.sendToEndpoint(message, this.ws)) {
 		return true;
 	} else if (!noPush) {
 		this.messageQueue.push(message);

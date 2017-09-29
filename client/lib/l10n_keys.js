@@ -15,7 +15,7 @@ String.toLocaleString({
 		$gui_back: 'Back',
 		$gui_logout: 'Logout',
 		
-		$prompt_choose_character: 'Choose your main',
+		$prompt_choose_character: 'Choose Main and Towers',
 		
 		$data_username: 'Username',
 		$data_password: 'Password',
@@ -36,8 +36,11 @@ String.toLocaleString({
 		$character_landmaster: 'Landmaster',
 		
 		$prep_chosen_character: 'Chosen character: %s',
+		$prep_tower: 'Towers',
 		
 		$image_start: '/assets/images/start/en_us.svg',
 		$image_start_desc: 'Start',
+		
+		$tower_petty_tower: 'Petty Tower',
 	}
 });

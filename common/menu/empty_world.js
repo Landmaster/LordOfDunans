@@ -214,16 +214,17 @@ if (Side.getSide() === Side.CLIENT) {
 			this.lampGlass.forEach(glass => glass.rotation.y = (this.mainInstance.frame * -0.009) % (2 * Math.PI));
 		}
 	};
-	
-	const playerUpdateHandler = function (ev, data) {
-		if (data.world instanceof EmptyWorld) {
-			if (data instanceof PlayerAddedEvent) {
-				data.player.setCharacterType(CharacterTypeBase.EMPTY);
-			}
-		}
-	};
-	
-	EventBus.addEventListener(PlayerAddedEvent.NAME, playerUpdateHandler);
 }
+
+const playerUpdateHandler = function (ev, data) {
+	if (data.world instanceof EmptyWorld) {
+		if (data instanceof PlayerAddedEvent) {
+			data.player.setCharacterType(CharacterTypeBase.EMPTY);
+			data.player.clearChosenTowers();
+		}
+	}
+};
+
+EventBus.addEventListener(PlayerAddedEvent.NAME, playerUpdateHandler);
 
 module.exports = EmptyWorld;

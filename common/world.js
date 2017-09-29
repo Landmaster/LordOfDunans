@@ -133,6 +133,7 @@ if (Side.getSide() === Side.CLIENT) {
 } else {
 	World.prototype.updateTick = function (delta) {
 		++this.elapsedTicks;
+		this.nonPlayerEntities.forEach(entity => entity.updateTick(delta));
 	};
 }
 

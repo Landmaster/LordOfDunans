@@ -8,6 +8,11 @@ const toBuffer = require('typedarray-to-buffer');
 
 let bson = new BSON();
 
+/**
+ * Construct an entity.
+ * @param world the world
+ * @constructor
+ */
 function Entity(world) {
 	this.world = world;
 	if (Side.getSide() === Side.SERVER) {
@@ -20,7 +25,9 @@ function Entity(world) {
  * For each tower class, set this property to {@code true}.
  * @type {boolean}
  */
-Entity.prototype.isTower = false;
+Object.defineProperty(Entity.prototype, 'isTower', {
+	value: false
+});
 
 /**
  * Deserialize an entity.
@@ -64,12 +71,17 @@ if (Side.getSide() === Side.CLIENT) {
 	 * The icon of the entity, if it is a tower.
 	 * @type {string}
 	 */
-	Entity.prototype.towerIcon = "";
+	Object.defineProperty(Entity.prototype, 'towerIcon', {
+		value: ""
+	});
 	
 	Entity.prototype.animate = function () {
 	};
 
 	Entity.prototype.render = function () {
+	};
+} else {
+	Entity.prototype.updateTick = function (delta) {
 	};
 }
 

@@ -9,6 +9,7 @@ const Promise = require('bluebird');
 const EmptyWorld = require('common/menu/empty_world');
 const PreparationWorld = require('common/menu/prep_world');
 const CharacterRegistry = require("common/character_registry");
+const UuidUtils = require("common/lib/uuid_utils");
 
 PacketHandler.register(0x0030, Packet.playPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.SERVER) {
@@ -62,9 +63,33 @@ PacketHandler.register(0x0033, Packet.setCharacterTypePacket, (packet, mainInsta
 		const player = mainInstance.getPlayerFromWS(ctx.ws);
 		if (player.world instanceof PreparationWorld) {
 			player.setCharacterType(CharacterRegistry.getCharacterType(packet.characterIdentifier));
+			PacketHandler.sendToEndpoint(packet, ctx.ws); // send back the packet
 		}
-		PacketHandler.sendToEndpoint(packet, ctx.ws); // send back the packet
 	} else {
-		mainInstance.thePlayer.setCharacterType(CharacterRegistry.getCharacterType(packet.characterIdentifier));
+		if (mainInstance.theWorld) {
+			let player = mainInstance.theWorld.players.get(UuidUtils.bytesToUuid(new Uint8Array(packet.uuid.toBuffer())));
+			if (player) {
+				player.setCharacterType(CharacterRegistry.getCharacterType(packet.characterIdentifier));
+			}
+		}
+	}
+});
+PacketHandler.register(0x0034, Packet.setTowerPacket, (packet, mainInstance, ctx) => {
+	if (Side.getSide() === Side.SERVER) {
+		const player = mainInstance.getPlayerFromWS(ctx.ws);
+		if (player.world instanceof PreparationWorld) {
+			player.toggleChosenTower(packet.tower);
+			PacketHandler.sendToEndpoint(new Packet.setAllTowersPacket(player.uuid, ...player.chosenTowers), ctx.ws);
+		}
+	}
+});
+PacketHandler.register(0x0035, Packet.setAllTowersPacket, (packet, mainInstance, ctx) => {
+	if (Side.getSide() === Side.CLIENT) {
+		if (mainInstance.theWorld) {
+			let player = mainInstance.theWorld.players.get(UuidUtils.bytesToUuid(new Uint8Array(packet.uuid.toBuffer())));
+			if (player) {
+				player.setChosenTowers(packet.towers);
+			}
+		}
 	}
 });
