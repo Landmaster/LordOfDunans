@@ -112,4 +112,15 @@ Accounts.prototype.addAccount = function addAccount(uname, pword) {
 	});
 };
 
+Accounts.prototype.getUsernameFromUUID = function (uuid) {
+	return this.server.db.then(db => db.createCollection('users')).then((usersColl) => {
+		return usersColl.findOne({_id: new mongo.Binary(toBuffer(uuid), mongo.Binary.SUBTYPE_UUID)}, {uname: true});
+	}).then((doc) => {
+		if (!doc) {
+			return null;
+		}
+		return doc.uname;
+	});
+};
+
 module.exports = Accounts;

@@ -16,7 +16,7 @@ function Dunans() {
 	/**
 	 * @type {WebSocket}
 	 */
-	this.ws = new WebSocket(getWS('/socket'));
+	this.ws = new WebSocket(getWS('/'));
 	this.ws.binaryType = 'arraybuffer';
 
 	this.ws.addEventListener('message', event => {

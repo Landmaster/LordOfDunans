@@ -1,5 +1,6 @@
 'use strict';
 
+const Player = require('common/player');
 const Promise = require('bluebird');
 const express = require('express');
 const fs = Promise.promisifyAll(require('fs'));
@@ -14,12 +15,12 @@ const PlayerDisconnectedEvent = require('common/events/player_disconnected');
 const PairingSet = require('common/algo/pairing_set');
 const Packet = require("common/lib/packet");
 const winston = require('winston');
+const Accounts = require('server/accounts/accounts');
 const AccountError = require('server/accounts/account_error');
 const EmptyWorld = require('common/menu/empty_world');
+const WebSocket = require('ws');
 
 function Server(app, port, root, databaseFormat) {
-	this.expressWS = require('express-ws')(app);
-	
 	root = root || process.cwd();
 	this.root = root;
 	
@@ -37,14 +38,16 @@ function Server(app, port, root, databaseFormat) {
 	
 	this.app.use(require('helmet')());
 	
-	this.app.use(session({
+	const sessionHandler = session({
 		secret: fs.readFileSync(root+'/private/session_info.txt', 'utf-8'),
 		name: 'session',
 		store: new MongoStore({ dbPromise: this.db }),
 		cookie: { maxAge: 1000*60*60*24*30 },
 		resave: false,
-		saveUninitialized: false,
-	}));
+		saveUninitialized: true,
+	});
+	
+	this.app.use(sessionHandler);
 	
 	const forbidden = function (req, res, next) {
 		res.status(403);
@@ -82,8 +85,27 @@ function Server(app, port, root, databaseFormat) {
 	 */
 	this.wsToUuidString = new WeakMap();
 	
-	this.app.ws('/socket', (ws, req) => {
+	this.httpServer = this.app.listen(port, () => {
+		winston.info('Starting server on port ' + port);
+	});
+	
+	this.wss = new WebSocket.Server({server: this.httpServer});
+	
+	this.wss.on('connection', (ws, req) => {
 		ws.isAlive = true;
+		
+		sessionHandler(req, {}, () => {
+			if (req.session.uuid && !this.clientMap.has(req.session.uuid)) {
+				const uuidBytes = Uint8Array.from(UuidUtils.uuidToBytes(req.session.uuid));
+				new Accounts(this).getUsernameFromUUID(uuidBytes).then((uname) => {
+					if (uname) {
+						this.addClient(new Player(new EmptyWorld(this), ws, this, {uname: uname, uuid: uuidBytes}));
+						PacketHandler.sendToEndpoint(new Packet.accountSuccessPacket(uname, uuidBytes), ws);
+					}
+				});
+			}
+		});
+		
 		ws.on('pong', () => ws.isAlive = true);
 		
 		// use the packet handler system
@@ -93,22 +115,22 @@ function Server(app, port, root, databaseFormat) {
 		// cleanup
 		ws.on('close', () => {
 			const uuidString = this.wsToUuidString.get(ws);
-			if (uuidString) this.removeClientByUUID(this.wsToUuidString.get(ws));
+			if (uuidString) this.removeClientByUUID(this.wsToUuidString.get(ws), req);
+			
+			if (!req.session.uuid) {
+				req.session.destroy();
+			}
 		});
 	});
 	
 	this.pongInterval = setInterval(() => {
-		this.expressWS.getWss().clients.forEach(ws => {
+		this.wss.clients.forEach(ws => {
 			if (ws.isAlive === false) return ws.terminate();
 			
 			ws.isAlive = false;
 			ws.ping('', false, true);
 		});
 	}, 30000);
-	
-	this.app.listen(port, () => {
-		winston.info('Starting server on port ' + port);
-	});
 }
 
 /**
@@ -146,8 +168,10 @@ Server.prototype.getPlayerFromWS = function getPlayerFromWS(ws) {
 /**
  * Remove a player with a given uuid.
  * @param {string|Uint8Array|Array.<number>} uuid
+ * @param req
+ * @param {?boolean} [explicitLogout]
  */
-Server.prototype.removeClientByUUID = function removeClientByUUID(uuid) {
+Server.prototype.removeClientByUUID = function removeClientByUUID(uuid, req, explicitLogout) {
 	const uuidString = typeof uuid === 'string' ? uuid : UuidUtils.bytesToUuid(uuid);
 	const uuidBytes = typeof uuid === 'string' ? UuidUtils.uuidToBytes(uuid) : uuid;
 	const player = this.clientMap.get(uuidString);
@@ -170,6 +194,10 @@ Server.prototype.removeClientByUUID = function removeClientByUUID(uuid) {
 			}
 		}
 		EventBus.dispatch(PlayerDisconnectedEvent.NAME, this, new PlayerDisconnectedEvent(uuidString));
+	}
+	if (explicitLogout) {
+		delete req.session.uuid;
+		req.session.save();
 	}
 };
 

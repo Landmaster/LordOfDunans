@@ -7,6 +7,7 @@ const PacketHandler = require('common/lib/packethandler');
 const Packet = require('common/lib/packet');
 const Player = require('common/player');
 const EmptyWorld = require('common/menu/empty_world');
+const UuidUtils = require("common/lib/uuid_utils");
 const sprintf = require('sprintf-js').sprintf;
 
 PacketHandler.register(0x0000, Packet.loginPacket, (packet, mainInstance, ctx) => {
@@ -16,6 +17,8 @@ PacketHandler.register(0x0000, Packet.loginPacket, (packet, mainInstance, ctx) =
 		
 		(new Accounts(mainInstance)).authAccount(packet.uname, packet.pword).then((res) => {
 			mainInstance.addClient(new Player(new EmptyWorld(mainInstance), ctx.ws, mainInstance, res));
+			ctx.req.session.uuid = UuidUtils.bytesToUuid(res.uuid);
+			ctx.req.session.save();
 			PacketHandler.sendToEndpoint(new Packet.accountSuccessPacket(res.uname, res.uuid), ctx.ws);
 		}).catch(AccountError, e => {
 			PacketHandler.sendToEndpoint(new Packet.accountErrorPacket(e, false), ctx.ws);
@@ -34,6 +37,8 @@ PacketHandler.register(0x0001, Packet.registerPacket, (packet, mainInstance, ctx
 		
 		(new Accounts(mainInstance)).addAccount(packet.uname, packet.pword).then((res) => {
 			mainInstance.addClient(new Player(new EmptyWorld(mainInstance), ctx.ws, mainInstance, res));
+			ctx.req.session.uuid = UuidUtils.bytesToUuid(res.uuid);
+			ctx.req.session.save();
 			PacketHandler.sendToEndpoint(new Packet.accountSuccessPacket(res.uname, res.uuid), ctx.ws);
 		}).catch(AccountError, e => {
 			PacketHandler.sendToEndpoint(new Packet.accountErrorPacket(e, true), ctx.ws);
@@ -67,7 +72,7 @@ PacketHandler.register(0x0004, Packet.logoutPacket, (packet, mainInstance, ctx) 
 	if (Side.getSide() === Side.CLIENT) {
 		mainInstance.setPlayer(null);
 	} else {
-		mainInstance.removeClientByUUID(mainInstance.getUUIDFromWS(ctx.ws));
+		mainInstance.removeClientByUUID(mainInstance.getUUIDFromWS(ctx.ws), ctx.req, true);
 		PacketHandler.sendToEndpoint(new Packet.logoutPacket(), ctx.ws);
 	}
 });
