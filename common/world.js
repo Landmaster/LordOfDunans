@@ -110,7 +110,10 @@ World.prototype.unload = function () {
 		this.sceneElementsToDispose.forEach(el => el.dispose());
 		this.sceneElementsToDispose.clear();
 	}
+	this.players.forEach((player) => player.despawn());
 	this.players = new Map();
+	
+	this.nonPlayerEntities.forEach((entity) => entity.despawn());
 	this.nonPlayerEntities = new Map();
 };
 

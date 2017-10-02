@@ -80,17 +80,32 @@ function Player(world, ws, mainInstance, options) {
 Player.prototype.spawn = function (world) {
 	this.world = world;
 	this.world.addPlayer(this);
+	if (Side.getSide() === Side.CLIENT) {
+		this.characterType.modelPromise(this.mainInstance).spread(meshes => {
+			if (meshes && meshes[0]) {
+				this.playerMesh = meshes[0].clone('player_model_'+UuidUtils.bytesToUuid(this.uuid));
+				this.playerMesh.isVisible = true;
+			} else {
+				this.playerMesh = null;
+			}
+		});
+	}
 };
 Player.prototype.despawn = function () {
 	this.world.removePlayer(this);
 	this.world = null;
+	if (Side.getSide() === Side.CLIENT) {
+		if (this.playerMesh && this.playerMesh.getScene().getEngine()) {
+			this.playerMesh.dispose();
+			this.playerMesh = null;
+		}
+	}
 };
 Player.prototype.setCharacterType = function (type) {
 	this.characterType = type;
 	if (Side.getSide() === Side.CLIENT) {
 		if (this.playerMesh && this.playerMesh.getScene().getEngine()) {
 			this.playerMesh.dispose();
-			this.world.sceneElementsToDispose.delete(this.playerMesh);
 			this.playerMesh = null;
 		}
 		
@@ -98,7 +113,8 @@ Player.prototype.setCharacterType = function (type) {
 			if (meshes && meshes[0]) {
 				this.playerMesh = meshes[0].clone('player_model_'+UuidUtils.bytesToUuid(this.uuid));
 				this.playerMesh.isVisible = true;
-				this.world.sceneElementsToDispose.add(this.playerMesh);
+			} else {
+				this.playerMesh = null;
 			}
 		});
 	}
