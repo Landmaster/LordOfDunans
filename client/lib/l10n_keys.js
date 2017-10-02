@@ -43,5 +43,6 @@ String.toLocaleString({
 		
 		$tower_petty_tower: 'Petty Tower',
 		$tower_tower_of_ignorance: 'Tower of Ignorance',
+		$tower_covert_tower: 'Covert Tower',
 	}
 });
