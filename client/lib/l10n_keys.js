@@ -42,5 +42,6 @@ String.toLocaleString({
 		$image_start_desc: 'Start',
 		
 		$tower_petty_tower: 'Petty Tower',
+		$tower_tower_of_ignorance: 'Tower of Ignorance',
 	}
 });
