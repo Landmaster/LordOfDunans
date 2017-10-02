@@ -59,10 +59,12 @@ if (Side.getSide() === Side.CLIENT) {
 		const groundMat = new BABYLON.StandardMaterial("ground_mat", this.scene);
 		groundMat.diffuseColor = new BABYLON.Color3(0, 0.6, 0);
 		this.ground.material = groundMat;
+		this.sceneElementsToDispose.add(this.ground);
 		
 		// lights on!
 		this.light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(-1, 1, 0), this.scene);
 		this.light.intensity = 0.5;
+		this.sceneElementsToDispose.add(this.light);
 	};
 	
 	/**

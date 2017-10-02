@@ -150,17 +150,21 @@ if (Side.getSide() === Side.CLIENT) {
 		const groundMat = new BABYLON.StandardMaterial("ground_mat", this.scene);
 		groundMat.diffuseColor = new BABYLON.Color3(0, 0.6, 0);
 		this.ground.material = groundMat;
+		this.sceneElementsToDispose.add(this.ground);
 		
 		// lights on!
 		this.light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(-1, 1, 0), this.scene);
 		this.light.intensity = 0.5;
+		this.sceneElementsToDispose.add(this.light);
 		
 		// the crystals in the center
 		this.crystalArray = null;
-		BABYLON.SceneLoader.ImportMesh('Crystal Array', '/assets/models/', 'crystalarray.babylon', this.scene, (meshes) => {
-			this.crystalArray = meshes[0];
+		this.renderManager.loadModel('Crystal Array', '/assets/models/', 'crystalarray.babylon').spread((meshes) => {
+			this.crystalArray = meshes[0].clone('crystal_array');
+			this.crystalArray.isVisible = true;
 			this.crystalArray.position = BABYLON.Vector3.Zero();
 			this.crystalArray.scaling = new BABYLON.Vector3(0.8, 0.8, 0.8);
+			this.sceneElementsToDispose.add(this.crystalArray);
 		});
 		
 		// side towers
@@ -177,6 +181,8 @@ if (Side.getSide() === Side.CLIENT) {
 		
 		this.cylinders[0].position = new BABYLON.Vector3(0, 3, -6);
 		this.cylinders[1].position = new BABYLON.Vector3(0, 3, +6);
+		
+		this.cylinders.forEach((cyl) => this.sceneElementsToDispose.add(cyl));
 		
 		// glass for lights
 		this.lampGlass = new Array(2);
@@ -198,10 +204,13 @@ if (Side.getSide() === Side.CLIENT) {
 		this.lampGlass[0].position = new BABYLON.Vector3(0, 7.5, -6);
 		this.lampGlass[1].position = new BABYLON.Vector3(0, 7.5, +6);
 		
+		this.lampGlass.forEach(gls => this.sceneElementsToDispose.add(gls));
+		
 		this.lampGlassLights = new Array(2);
 		for (let i=0; i<this.lampGlassLights.length; ++i) {
 			this.lampGlassLights[i] = new BABYLON.PointLight('lamp_glass_light'+i, this.lampGlass[i].position, this.scene);
 		}
+		this.lampGlassLights.forEach(lgl => this.sceneElementsToDispose.add(lgl));
 	};
 	
 	EmptyWorld.prototype.animate = function () {

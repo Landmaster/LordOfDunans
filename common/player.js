@@ -90,6 +90,7 @@ Player.prototype.setCharacterType = function (type) {
 	if (Side.getSide() === Side.CLIENT) {
 		if (this.playerMesh && this.playerMesh.getScene().getEngine()) {
 			this.playerMesh.dispose();
+			this.world.sceneElementsToDispose.delete(this.playerMesh);
 			this.playerMesh = null;
 		}
 		
@@ -97,6 +98,7 @@ Player.prototype.setCharacterType = function (type) {
 			if (meshes && meshes[0]) {
 				this.playerMesh = meshes[0].clone('player_model_'+UuidUtils.bytesToUuid(this.uuid));
 				this.playerMesh.isVisible = true;
+				this.world.sceneElementsToDispose.add(this.playerMesh);
 			}
 		});
 	}

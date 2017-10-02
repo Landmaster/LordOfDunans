@@ -40,6 +40,12 @@ function World(mainInstance) {
 		 * @type {Array.<Element|Array>}
 		 */
 		this.htmlElementsToToggle = [];
+		
+		/**
+		 * When the world is unloaded, dispose these scene elements.
+		 * @type {Set}
+		 */
+		this.sceneElementsToDispose = new Set();
 	} else {
 		this.elapsedTicks = 0;
 	}
@@ -101,8 +107,8 @@ World.prototype.unload = function () {
 		this.camera.detachControl(this.mainInstance.canvas);
 		const Loading = require('client/lib/dom/loading');
 		this.htmlElementsToToggle.forEach(Loading.unload);
-		this.scene.dispose();
-		this.scene = null;
+		this.sceneElementsToDispose.forEach(el => el.dispose());
+		this.sceneElementsToDispose.clear();
 	}
 	this.players = new Map();
 	this.nonPlayerEntities = new Map();
@@ -113,12 +119,12 @@ if (Side.getSide() === Side.CLIENT) {
 	const RenderManager = require('client/lib/render/render_manager');
 	
 	World.prototype.initScene = function () {
-		this.scene = new BABYLON.Scene(this.mainInstance.engine);
-		this.scene.clearColor = new BABYLON.Color4(0,0,0);
+		this.scene = this.mainInstance.theScene;
 		
-		this.renderManager = new RenderManager(this.scene);
+		this.renderManager = this.mainInstance.renderManager;
 		
 		this.camera = new BABYLON.TargetCamera('camera', new BABYLON.Vector3(0,0,0), this.scene);
+		this.sceneElementsToDispose.add(this.camera);
 	};
 	
 	World.prototype.animate = function () {
