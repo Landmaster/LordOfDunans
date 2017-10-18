@@ -44,9 +44,17 @@
 	position: absolute;
 	top: 100%;
 	left: 50%;
+	transform: translateX(-50%);
+	cursor: pointer;
+}
+.start_button > img {
 	width: 13em;
 	height: auto;
-	transform: translateX(-50%);
+	display: block;
+	margin: 0 auto;
+}
+.start_timer {
+	text-align: center;
 }
 .chosen_character_header {
 	color: white;

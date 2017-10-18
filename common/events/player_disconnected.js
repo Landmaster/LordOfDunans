@@ -1,10 +1,9 @@
 /**
  * Fired when a player disconnects.
- * @param {String} uuid the uuid
  * @constructor
  */
-function PlayerDisconnectedEvent(uuid) {
-	this.uuid = uuid;
+function PlayerDisconnectedEvent(player) {
+	this.player = player;
 }
 PlayerDisconnectedEvent.NAME = "PLAYER_DISCONNECTED";
 module.exports = PlayerDisconnectedEvent;

@@ -3,6 +3,7 @@
  */
 
 const World = require('common/world');
+const GameWorld = require('common/gameplay/game_world');
 const Side = require('common/lib/side');
 const EventBus = require('eventbusjs');
 const PlayerAddedEvent = require('common/events/player_added');
@@ -13,6 +14,7 @@ const CharacterRegistry = require('common/character_types/character_registry_def
 const CharacterTypeBase = require('common/character_types/character_type_base');
 const UuidUtils = require("common/lib/uuid_utils");
 const Packet = require("common/lib/packet");
+const PacketHandler = require('common/lib/packethandler');
 const sp = require('sprintf-js');
 const EntityRegistry = require('common/entities/entity_registry_default');
 
@@ -23,6 +25,15 @@ const EntityRegistry = require('common/entities/entity_registry_default');
  */
 function PreparationWorld(mainInstance) {
 	World.call(this, mainInstance);
+	
+	this.timeRemaining = PreparationWorld.TIMER_LEN;
+	
+	/**
+	 * Set of UUID of started players.
+	 * @type {Set.<string>}
+	 */
+	this.lockedPlayers = new Set();
+	
 	if (Side.getSide() === Side.CLIENT) {
 		/**
 		 * Match review HTML div.
@@ -43,6 +54,18 @@ PreparationWorld.prototype = Object.create(World.prototype, {
 		configurable: true
 	}
 });
+
+PreparationWorld.TIMER_LEN = 90*1000;
+
+PreparationWorld.prototype.lockPlayer = function (playerUUID) {
+	this.lockedPlayers.add(playerUUID);
+};
+PreparationWorld.prototype.unlockPlayer = function (playerUUID) {
+	this.lockedPlayers.delete(playerUUID);
+};
+PreparationWorld.prototype.isPlayerLocked = function (playerUUID) {
+	return this.lockedPlayers.has(playerUUID);
+};
 
 if (Side.getSide() === Side.CLIENT) {
 	PreparationWorld.prototype.initScene = function () {
@@ -65,6 +88,17 @@ if (Side.getSide() === Side.CLIENT) {
 		this.light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(-1, 1, 0), this.scene);
 		this.light.intensity = 0.5;
 		this.sceneElementsToDispose.add(this.light);
+	};
+	
+	PreparationWorld.prototype.updateStartTimer = function () {
+		let _startTimers = document.getElementsByClassName("start_timer");
+		for (let _startTimer of _startTimers) {
+			if (this.isPlayerLocked(UuidUtils.bytesToUuid(this.mainInstance.thePlayer.uuid))) {
+				_startTimer.textContent = sp.sprintf('$start_wait'.toLocaleString(), Math.ceil(this.timeRemaining / 1000));
+			} else {
+				_startTimer.textContent = sp.sprintf('$start_timer'.toLocaleString(), Math.ceil(this.timeRemaining / 1000));
+			}
+		}
 	};
 	
 	/**
@@ -144,13 +178,28 @@ if (Side.getSide() === Side.CLIENT) {
 				this.matchReview.appendChild(_playerBody); // Only append the element at the end, to minimize the amount of needed DOM updates.
 			}
 			
-			let _startButton = document.createElement("img");
+			let _startButton = document.createElement("div");
 			_startButton.classList.add('start_button');
-			_startButton.src = '$image_start'.toLocaleString();
-			_startButton.alt = '$image_start_desc'.toLocaleString();
+			_startButton.addEventListener("click", () => {
+				if (this.mainInstance.thePlayer.verifyPlayable()) {
+					this.mainInstance.sendToServer(new Packet.startGamePacket());
+				}
+			});
+			
+			let _startButtonImage = document.createElement("img");
+			_startButtonImage.src = '$image_start'.toLocaleString();
+			_startButtonImage.alt = '$image_start_desc'.toLocaleString();
+			
+			let _startButtonRemaining = document.createElement("div");
+			_startButtonRemaining.classList.add("start_timer");
+			
+			_startButton.appendChild(_startButtonImage);
+			_startButton.appendChild(_startButtonRemaining);
+			
 			this.matchReview.appendChild(_startButton);
 			
 			this._updateChosenCharacter();
+			this.updateStartTimer();
 		} else {
 			let _loadingMeter = document.createElement("div");
 			_loadingMeter.classList.add("loading_meter");
@@ -234,8 +283,51 @@ if (Side.getSide() === Side.CLIENT) {
 			}
 		}
 	});
-} // #END Side.getSide() === Side.CLIENT
-
+} else {// #END Side.getSide() === Side.CLIENT
+	PreparationWorld.prototype.updateTick = function updateTick (delta) {
+		World.prototype.updateTick.call(this, delta);
+		let prevFloor = Math.floor(this.timeRemaining);
+		this.timeRemaining -= (1000 / World.TICKS_PER_SEC);
+		if (Math.floor(this.timeRemaining) < prevFloor) {
+			for (let player of this.players.values()) {
+				PacketHandler.sendToEndpoint(new Packet.prepTimerPacket(this.timeRemaining), player.ws);
+			}
+		}
+		if (this.timeRemaining <= 0) {
+			const EmptyWorld = require('./empty_world');
+			
+			let willStart = true;
+			for (let player of this.players.values()) {
+				if (!player.verifyPlayable()) {
+					willStart = false;
+					break;
+				}
+			}
+			if (!willStart) {
+				for (let player of this.players.values()) {
+					let isCauser = !player.verifyPlayable();
+					player.despawn();
+					player.spawn(new EmptyWorld(this.mainInstance).load());
+					PacketHandler.sendToEndpoint(new Packet.notStartedInTimePacket(isCauser), player.ws);
+				}
+				this.unload();
+			} else {
+				this.doStart();
+			}
+		}
+	};
+	
+	PreparationWorld.prototype.doStart = function () {
+		let newWorld = new GameWorld(this.mainInstance);
+		
+		for (let player of this.players.values()) {
+			player.despawn();
+			player.spawn(newWorld.load());
+			
+			PacketHandler.sendToEndpoint(new Packet.startedGamePacket(), player.ws);
+		}
+	};
+}
 
 const playerUpdateHandler = function (ev, data) {
 	if (data.world instanceof PreparationWorld) {

@@ -68,12 +68,6 @@ function Server(app, port, root, databaseFormat) {
 	this.clientMap = new Map();
 	
 	/**
-	 * Holds the players waiting for opponents, mapping them to a deferred object.
-	 * @type {Map.<Player, defer>}
-	 */
-	this.pendingPlayers = new Map();
-	
-	/**
 	 *
 	 * @type {PairingSet.<Player>}
 	 */
@@ -99,7 +93,7 @@ function Server(app, port, root, databaseFormat) {
 				const uuidBytes = Uint8Array.from(UuidUtils.uuidToBytes(req.session.uuid));
 				new Accounts(this).getUsernameFromUUID(uuidBytes).then((uname) => {
 					if (uname) {
-						this.addClient(new Player(new EmptyWorld(this), ws, this, {uname: uname, uuid: uuidBytes}));
+						this.addClient(new Player(new EmptyWorld(this).load(), ws, this, {uname: uname, uuid: uuidBytes}));
 						PacketHandler.sendToEndpoint(new Packet.accountSuccessPacket(uname, uuidBytes), ws);
 					}
 				});
@@ -120,6 +114,9 @@ function Server(app, port, root, databaseFormat) {
 			if (!req.session.uuid) {
 				req.session.destroy();
 			}
+		});
+		
+		ws.on('error', (e) => {
 		});
 	});
 	
@@ -177,7 +174,7 @@ Server.prototype.removeClientByUUID = function removeClientByUUID(uuid, req, exp
 	const player = this.clientMap.get(uuidString);
 	if (player) {
 		player.despawn();
-		this.pendingPlayers.delete(player);
+		EventBus.dispatch(PlayerDisconnectedEvent.NAME, this, new PlayerDisconnectedEvent(player));
 		this.clientMap.delete(uuidString);
 		this.wsToUuidString.delete(player.ws);
 		let pair = this.pairedPlayers.getPair(player);
@@ -186,14 +183,14 @@ Server.prototype.removeClientByUUID = function removeClientByUUID(uuid, req, exp
 				if (pairElem === player) {
 					this.pairedPlayers.deleteElem(pairElem);
 				} else {
-					let newWorld = new EmptyWorld(this);
+					let newWorld = new EmptyWorld(this).load();
 					pairElem.despawn();
 					pairElem.spawn(newWorld);
 					PacketHandler.sendToEndpoint(new Packet.opponentDisconnectedPacket(uuidBytes), pairElem.ws);
 				}
 			}
 		}
-		EventBus.dispatch(PlayerDisconnectedEvent.NAME, this, new PlayerDisconnectedEvent(uuidString));
+		
 	}
 	if (explicitLogout) {
 		delete req.session.uuid;

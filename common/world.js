@@ -10,6 +10,8 @@ const EntityAddedEvent = require('common/events/entity_added');
 const EntityRemovedEvent = require('common/events/entity_removed');
 const PlayerAddedEvent = require('common/events/player_added');
 const PlayerRemovedEvent = require('common/events/player_removed');
+const WorldLoadedEvent = require("./events/world_loaded");
+const WorldUnloadedEvent = require("./events/world_unloaded");
 
 /**
  * Create a new world.
@@ -18,6 +20,8 @@ const PlayerRemovedEvent = require('common/events/player_removed');
  */
 function World(mainInstance) {
 	this.mainInstance = mainInstance;
+	
+	this.isLoaded = false;
 
 	if (Side.getSide() === Side.CLIENT) {
 		const BABYLON = require('babylonjs');
@@ -87,34 +91,44 @@ World.prototype.removePlayer = function (player) {
  * Loads the world.
  */
 World.prototype.load = function () {
-	if (Side.getSide() === Side.SERVER) {
-		this.loopID = gameloop.setGameLoop(delta => this.updateTick(delta), 1000 / World.TICKS_PER_SEC);
-	} else {
-		this.initScene();
-		this.camera.attachControl(this.mainInstance.canvas, false);
-		const Loading = require('client/lib/dom/loading');
-		this.htmlElementsToToggle.forEach(Loading.load);
+	if (!this.isLoaded) {
+		if (Side.getSide() === Side.SERVER) {
+			this.loopID = gameloop.setGameLoop(delta => this.updateTick(delta), 1000 / World.TICKS_PER_SEC);
+		} else {
+			this.initScene();
+			this.camera.attachControl(this.mainInstance.canvas, false);
+			const Loading = require('client/lib/dom/loading');
+			this.htmlElementsToToggle.forEach(Loading.load);
+		}
+		EventBus.dispatch(WorldLoadedEvent.NAME, this, new WorldLoadedEvent(this));
 	}
+	this.isLoaded = true;
+	return this;
 };
 
 /**
  * Unloads the world for changing/deletion.
  */
 World.prototype.unload = function () {
-	if (Side.getSide() === Side.SERVER) {
-		gameloop.clearGameLoop(this.loopID);
-	} else {
-		this.camera.detachControl(this.mainInstance.canvas);
-		const Loading = require('client/lib/dom/loading');
-		this.htmlElementsToToggle.forEach(Loading.unload);
-		this.sceneElementsToDispose.forEach(el => el.dispose());
-		this.sceneElementsToDispose.clear();
+	if (this.isLoaded) {
+		if (Side.getSide() === Side.SERVER) {
+			gameloop.clearGameLoop(this.loopID);
+		} else {
+			this.camera.detachControl(this.mainInstance.canvas);
+			const Loading = require('client/lib/dom/loading');
+			this.htmlElementsToToggle.forEach(Loading.unload);
+			this.sceneElementsToDispose.forEach(el => el.dispose());
+			this.sceneElementsToDispose.clear();
+		}
+		this.players.forEach((player) => player.despawn());
+		this.players = new Map();
+		
+		this.nonPlayerEntities.forEach((entity) => entity.despawn());
+		this.nonPlayerEntities = new Map();
+		EventBus.dispatch(WorldUnloadedEvent.NAME, this, new WorldUnloadedEvent(this));
 	}
-	this.players.forEach((player) => player.despawn());
-	this.players = new Map();
-	
-	this.nonPlayerEntities.forEach((entity) => entity.despawn());
-	this.nonPlayerEntities = new Map();
+	this.isLoaded = false;
+	return this;
 };
 
 if (Side.getSide() === Side.CLIENT) {

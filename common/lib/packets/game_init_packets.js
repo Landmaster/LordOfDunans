@@ -121,5 +121,32 @@ Packet.setAllTowersPacket.prototype.serialize = function (buf) {
 	}
 };
 
+Packet.startGamePacket = function startGamePacket() {};
+Packet.startGamePacket.prototype.deserialize = function () {};
+Packet.startGamePacket.prototype.serialize = function () {};
+
+Packet.prepTimerPacket = function prepTimerPacket(time) {
+	this.time = time;
+};
+Packet.prepTimerPacket.prototype.deserialize = function (buf) {
+	this.time = buf.readDouble();
+};
+Packet.prepTimerPacket.prototype.serialize = function (buf) {
+	buf.writeDouble(this.time);
+};
+
+Packet.notStartedInTimePacket = function notStartedInTimePacket(isCauser) {
+	this.isCauser = isCauser;
+};
+Packet.notStartedInTimePacket.prototype.deserialize = function (buf) {
+	this.isCauser = !!buf.readByte();
+};
+Packet.notStartedInTimePacket.prototype.serialize = function (buf) {
+	buf.writeByte(this.isCauser ? 1 : 0);
+};
+
+Packet.startedGamePacket = function startedGamePacket () {};
+Packet.startedGamePacket.prototype.deserialize = function () {};
+Packet.startedGamePacket.prototype.serialize = function () {};
 
 module.exports = Packet;

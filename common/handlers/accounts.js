@@ -16,7 +16,7 @@ PacketHandler.register(0x0000, Packet.loginPacket, (packet, mainInstance, ctx) =
 		const AccountError = require('server/accounts/account_error');
 		
 		(new Accounts(mainInstance)).authAccount(packet.uname, packet.pword).then((res) => {
-			mainInstance.addClient(new Player(new EmptyWorld(mainInstance), ctx.ws, mainInstance, res));
+			mainInstance.addClient(new Player(new EmptyWorld(mainInstance).load(), ctx.ws, mainInstance, res));
 			ctx.req.session.uuid = UuidUtils.bytesToUuid(res.uuid);
 			ctx.req.session.save();
 			PacketHandler.sendToEndpoint(new Packet.accountSuccessPacket(res.uname, res.uuid), ctx.ws);
@@ -36,7 +36,7 @@ PacketHandler.register(0x0001, Packet.registerPacket, (packet, mainInstance, ctx
 		const AccountError = require('server/accounts/account_error');
 		
 		(new Accounts(mainInstance)).addAccount(packet.uname, packet.pword).then((res) => {
-			mainInstance.addClient(new Player(new EmptyWorld(mainInstance), ctx.ws, mainInstance, res));
+			mainInstance.addClient(new Player(new EmptyWorld(mainInstance).load(), ctx.ws, mainInstance, res));
 			ctx.req.session.uuid = UuidUtils.bytesToUuid(res.uuid);
 			ctx.req.session.save();
 			PacketHandler.sendToEndpoint(new Packet.accountSuccessPacket(res.uname, res.uuid), ctx.ws);

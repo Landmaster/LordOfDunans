@@ -45,5 +45,11 @@ String.toLocaleString({
 		$tower_tower_of_ignorance: 'Tower of Ignorance',
 		$tower_covert_tower: 'Covert Tower',
 		$tower_tower_of_activists: 'Tower of Activists',
+		
+		$start_timer: '%s seconds left',
+		$start_wait: 'Waiting for opponent (%s seconds)',
+		
+		$error_not_in_time: 'Did not start in time',
+		$error_opponent_not_in_time: 'Opponent did not start in time',
 	}
 });

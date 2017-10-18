@@ -76,7 +76,9 @@ function Player(world, ws, mainInstance, options) {
 	}
 }
 
-
+Player.prototype.verifyPlayable = function () {
+	return this.characterType !== CharacterTypeBase.EMPTY && this.chosenTowers.every(tower => tower);
+};
 Player.prototype.spawn = function (world) {
 	this.world = world;
 	this.world.addPlayer(this);

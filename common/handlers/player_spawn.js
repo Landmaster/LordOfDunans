@@ -16,16 +16,14 @@ PacketHandler.register(0x0021, Packet.playerDeathPacket, (packet, mainInstance, 
 });
 PacketHandler.register(0x0022, Packet.opponentDisconnectedPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT) {
-		if (mainInstance.theWorld instanceof PreparationWorld) { // We were still preparing for a game
-			const newWorld = new EmptyWorld(mainInstance);
-			if (mainInstance.thePlayer) {
-				mainInstance.thePlayer.despawn(mainInstance.theWorld);
-				mainInstance.thePlayer.spawn(newWorld);
-			}
-			mainInstance.setWorld(newWorld);
-			
-			const vex = require('vex-js');
-			vex.dialog.alert('$error_opponent_disconnected'.toLocaleString());
+		const newWorld = new EmptyWorld(mainInstance);
+		if (mainInstance.thePlayer) {
+			mainInstance.thePlayer.despawn();
+			mainInstance.thePlayer.spawn(newWorld);
 		}
+		mainInstance.setWorld(newWorld);
+		
+		const vex = require('vex-js');
+		vex.dialog.alert('$error_opponent_disconnected'.toLocaleString());
 	}
 });
