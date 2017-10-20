@@ -320,16 +320,29 @@ if (Side.getSide() === Side.CLIENT) {
 	PreparationWorld.prototype.doStart = function () {
 		let newWorld = new GameWorld(this.mainInstance);
 		
+		let characterTypePackets = [];
+		let towerPackets = [];
+		
+		for (let player of this.players.values()) {
+			characterTypePackets.push(new Packet.setCharacterTypePacket(player.uuid,
+				CharacterRegistry.getCharacterIdentifier(player.characterType)));
+			towerPackets.push(new Packet.setAllTowersPacket(player.uuid,
+				...player.chosenTowers));
+		}
+		
 		for (let player of this.players.values()) {
 			player.despawn();
 			player.spawn(newWorld.load());
+			
+			characterTypePackets.forEach(pkt => PacketHandler.sendToEndpoint(pkt, player.ws));
+			towerPackets.forEach(pkt => PacketHandler.sendToEndpoint(pkt, player.ws));
 			
 			PacketHandler.sendToEndpoint(new Packet.startedGamePacket(), player.ws);
 		}
 	};
 }
 
-const playerUpdateHandler = function (ev, data) {
+const playerUpdateHandler = (ev, data) => {
 	if (data.world instanceof PreparationWorld) {
 		if (data instanceof PlayerAddedEvent) {
 			data.player.setCharacterType(CharacterTypeBase.EMPTY);

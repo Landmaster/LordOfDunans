@@ -53,10 +53,10 @@ Packet.playListPacket.prototype.getPlayers = function* (clientInstance) {
 		if (clientInstance.thePlayer
 			&& UuidUtils.bytesToUuid(clientInstance.thePlayer.uuid)
 			=== UuidUtils.bytesToUuid(player.uuid)) {
-			yield clientInstance.thePlayer; // yield main player
-		} else {
-			yield player;
+			player = clientInstance.thePlayer; // yield main player
 		}
+		player.index = i;
+		yield player;
 	}
 };
 

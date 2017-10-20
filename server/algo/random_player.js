@@ -25,10 +25,14 @@ function findRandomOpponent(server, player, timeout) {
 	
 	for (let [pendingPlayer, pendingDfd] of pendingPlayers) {
 		if (player !== pendingPlayer) { // found a waiting player
-			let arr = [player, pendingPlayer];
+			let arr = [pendingPlayer, player];
+			
+			// See documentation for details
+			player.index = 1;
+			
 			player.despawn();
 			player.spawn(pendingPlayer.world);
-			player.setPositionAndUpdate(new Vec3(0, 0, -7));
+			player.setPositionAndUpdate(new Vec3(0, 0, 7));
 			
 			pendingPlayers.delete(pendingPlayer);
 			server.pairedPlayers.addPair(...arr);
@@ -38,9 +42,12 @@ function findRandomOpponent(server, player, timeout) {
 	}
 	const df = new defer();
 	pendingPlayers.set(player, df);
+	
+	player.index = 0;
+	
 	player.despawn();
 	player.spawn(new PreparationWorld(server).load());
-	player.setPositionAndUpdate(new Vec3(0, 0, 7));
+	player.setPositionAndUpdate(new Vec3(0, 0, -7));
 	
 	return df.promise.timeout(timeout).catch(Promise.TimeoutError, e => {
 		pendingPlayers.delete(player);

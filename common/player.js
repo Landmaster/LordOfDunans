@@ -71,6 +71,15 @@ function Player(world, ws, mainInstance, options) {
 	 */
 	this.chosenTowers = new Array(EntityRegistry.TOWERS_PER_PLAYER);
 	
+	/**
+	 * The index of a player is a number, 0 or 1, which determines the
+	 * order of two competing players. The player who waits for the
+	 * opponent gets index 0, whereas the player who plays with a
+	 * waiting player gets index 1.
+	 * @type {number}
+	 */
+	this.index = 0;
+	
 	if (Side.getSide() === Side.CLIENT) {
 		this.playerMesh = null;
 	}
@@ -161,6 +170,10 @@ Player.prototype.deserialize = function (buf) {
 	this.pos = Vec3.fromBSON(obj.pos);
 };
 
+/**
+ *
+ * @param {Vec3} pos
+ */
 Player.prototype.setPositionAndUpdate = function (pos) {
 	this.pos = pos;
 	if (Side.getSide() === Side.SERVER) {
