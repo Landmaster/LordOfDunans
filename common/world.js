@@ -157,9 +157,14 @@ if (Side.getSide() === Side.CLIENT) {
 	World.prototype.updateTick = function (delta) {
 		++this.elapsedTicks;
 		this.nonPlayerEntities.forEach(entity => entity.updateTick(delta));
+		this.players.forEach(player => player.updateTick(delta));
 	};
 }
 
+/**
+ * The number of ticks per second.
+ * @type {number}
+ */
 World.TICKS_PER_SEC = 20;
 
 module.exports = World;

@@ -78,7 +78,7 @@ if (Side.getSide() === Side.CLIENT) {
 		this.camera.setTarget(BABYLON.Vector3.Zero());
 		
 		// for the ground
-		this.ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 128, height: 128}, this.scene);
+		this.ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 1024, height: 1024}, this.scene);
 		const groundMat = new BABYLON.StandardMaterial("ground_mat", this.scene);
 		groundMat.diffuseColor = new BABYLON.Color3(0, 0.6, 0);
 		this.ground.material = groundMat;

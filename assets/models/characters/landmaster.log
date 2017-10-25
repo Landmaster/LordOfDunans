@@ -7,16 +7,20 @@
 		texture directory:  /Users/phuong/Documents/workspace/lordofdunans/assets/models/characters/
 	Python World class constructor completed
 	processing begun of mesh:  landmaster
-		processing begun of Standard material:  Material
-		num positions      :  8
-		num normals        :  8
-		num uvs            :  0
+		processing begun of Standard material:  Material.002
+			Diffuse texture found "Texture"
+				Image texture found, type:  diffuseTexture, mapped using: "UVMap"
+	WARNING: Error encountered processing image file:  , Error:  '/Users/phuong/Documents/workspace/lordofdunans/assets/models/characters/landmaster.png' and '/Users/phuong/Documents/workspace/lordofdunans/assets/models/characters/landmaster.png' are the same file
+		num positions      :  16
+		num normals        :  16
+		num uvs            :  32
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  36
 	processing begun of camera (FreeCamera):  Camera
+	processing begun of light (POINT):  Point
 	processing begun of light (POINT):  Lamp
 ========= Writing of scene file started =========
 ========= Writing of scene file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 0.0059 secs
+elapsed time:  0 min, 0.0068 secs

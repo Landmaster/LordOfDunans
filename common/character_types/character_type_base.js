@@ -32,8 +32,20 @@ if (Side.getSide() === Side.CLIENT) {
 		return model && mainInstance.theWorld.renderManager ?
 			mainInstance.theWorld.renderManager.loadModel(this.identifier, '/assets/models/characters/', model)
 			: Promise.resolve([]);
-	}
+	};
 }
+
+CharacterTypeBase.prototype.maxWalkVelocity = function () {
+	return 1;
+};
+/*
+CharacterTypeBase.prototype.accelerationFactor = function () {
+	return 0.1;
+};
+CharacterTypeBase.prototype.frictionFactor = function () {
+	return 0.03;
+};
+*/
 
 CharacterTypeBase.EMPTY = new CharacterTypeBase('');
 

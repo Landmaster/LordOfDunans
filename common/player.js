@@ -16,6 +16,8 @@ const PacketHandler = require("./lib/packethandler");
 const Packet = require("./lib/packet");
 const EntityRegistry = require("common/entity_registry");
 const SetChosenTowersEvent = require("./events/set_chosen_towers");
+const Directions = require('common/lib/directions');
+const World = require("./world");
 
 let bson = new BSON();
 
@@ -36,9 +38,37 @@ function Player(world, ws, mainInstance, options) {
 	 */
 	this.world = world;
 	/**
-	 * @type {Vec3}
+	 * @type {!Vec3}
 	 */
 	this.pos = Vec3.zero();
+	
+	/**
+	 * Relative to +x. CC is positive.
+	 * TODO change if not correct
+	 * @type {number}
+	 */
+	this.yaw = 0;
+	
+	/**
+	 * Relative to horizontal.
+	 * @type {number}
+	 */
+	this.pitch = 0;
+	
+	/**
+	 * In units/second.
+	 * @type {!Vec3}
+	 */
+	this.velocity = Vec3.zero();
+	
+	/**
+	 * In units/second^2.
+	 * @type {!Vec3}
+	 */
+	this.acceleration = Vec3.zero();
+	
+	this.movementDirections = new Set();
+	
 	/**
 	 *
 	 * @type {WebSocket}
@@ -86,7 +116,15 @@ function Player(world, ws, mainInstance, options) {
 }
 
 Player.prototype.verifyPlayable = function () {
-	return this.characterType !== CharacterTypeBase.EMPTY && this.chosenTowers.every(tower => tower);
+	if (this.characterType === CharacterTypeBase.EMPTY) {
+		return false;
+	}
+	for (let i=0; i<EntityRegistry.TOWERS_PER_PLAYER; ++i) {
+		if (!this.chosenTowers[i]) {
+			return false;
+		}
+	}
+	return true;
 };
 Player.prototype.spawn = function (world) {
 	this.world = world;
@@ -169,6 +207,9 @@ Player.prototype.deserialize = function (buf) {
 	this.uname = obj.uname;
 	this.pos = Vec3.fromBSON(obj.pos);
 };
+Player.prototype.getEyeHeight = function () {
+	return 2.8;
+};
 
 /**
  *
@@ -181,11 +222,38 @@ Player.prototype.setPositionAndUpdate = function (pos) {
 	}
 };
 
+Player.prototype.setRotationAndUpdate = function (yaw, pitch) {
+	this.yaw = yaw;
+	this.pitch = pitch;
+	if (Side.getSide() === Side.SERVER) {
+		PacketHandler.sendToEndpoint(new Packet.playerRotationPacket(this.uuid, this.yaw, this.pitch), this.ws);
+	}
+};
+
 if (Side.getSide() === Side.CLIENT) {
+	const BABYLON = require('babylonjs');
+	
 	Player.prototype.render = function () {
 		if (this.playerMesh) {
 			this.playerMesh.position = this.pos.toBabylon();
+			this.playerMesh.rotation = new BABYLON.Vector3(0, -this.yaw, 0);
 		}
+		this.pos = this.pos.add(this.velocity.scale(this.mainInstance.engine.getDeltaTime() / 1000));
+	};
+} else {
+	Player.prototype.updateTick = function (delta) {
+		if (this.pos.y <= 1e-4) { // on ground
+			this.acceleration = Vec3.zero();
+			let nonRotatedDirs = Vec3.zero();
+			for (let dir of this.movementDirections) {
+				nonRotatedDirs = nonRotatedDirs.add(Directions.getUnitVector(dir));
+			}
+			let rotatedDirs = nonRotatedDirs.rotate(this.yaw, 0);
+			this.velocity = rotatedDirs.scale(this.characterType.maxWalkVelocity());
+		}
+		
+		this.velocity = this.velocity.add(this.acceleration.scale(1/World.TICKS_PER_SEC));
+		this.pos = this.pos.add(this.velocity.scale(1/World.TICKS_PER_SEC));
 	};
 }
 

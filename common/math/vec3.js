@@ -6,6 +6,10 @@ function Vec3(x,y,z) {
 	this.y = y || 0;
 	this.z = z || 0;
 }
+
+/**
+ * @return {Vec3}
+ */
 Vec3.zero = () => new Vec3(0, 0, 0);
 Vec3.prototype.addTriple = function (x, y, z) {
 	return !x && !y && !z ? this : new Vec3(this.x+x, this.y+y, this.z+z);
@@ -38,6 +42,24 @@ Vec3.prototype.dist2 = function (vec) {
 Vec3.prototype.dist = function (vec) {
 	return Math.sqrt(this.dist2(vec));
 };
+Vec3.prototype.dotProduct = function (vec) {
+	return this.x*vec.x+this.y*vec.y+this.z*vec.z;
+};
+Vec3.prototype.project = function (on) {
+	if (on.len2() < 1e-8) return Vec3.zero();
+	return on.scale(this.dotProduct(on) / on.dotProduct(on));
+};
+Vec3.prototype.rotate = function (yaw, pitch) {
+	return new Vec3(
+		Math.cos(yaw)*Math.cos(pitch),
+		Math.sin(pitch),
+		Math.sin(yaw)*Math.cos(pitch))
+		.scale(this.len());
+};
+Vec3.prototype.negate = function () {
+	return new Vec3(-this.x,-this.y,-this.z);
+};
+
 Vec3.prototype.toBabylon = function () {
 	const BABYLON = require('babylonjs');
 	return new BABYLON.Vector3(this.x, this.y, this.z);

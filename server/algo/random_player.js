@@ -33,6 +33,7 @@ function findRandomOpponent(server, player, timeout) {
 			player.despawn();
 			player.spawn(pendingPlayer.world);
 			player.setPositionAndUpdate(new Vec3(0, 0, 7));
+			player.setRotationAndUpdate(0, 0);
 			
 			pendingPlayers.delete(pendingPlayer);
 			server.pairedPlayers.addPair(...arr);
@@ -48,6 +49,7 @@ function findRandomOpponent(server, player, timeout) {
 	player.despawn();
 	player.spawn(new PreparationWorld(server).load());
 	player.setPositionAndUpdate(new Vec3(0, 0, -7));
+	player.setRotationAndUpdate(0, 0);
 	
 	return df.promise.timeout(timeout).catch(Promise.TimeoutError, e => {
 		pendingPlayers.delete(player);
