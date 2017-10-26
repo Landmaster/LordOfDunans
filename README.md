@@ -1,2 +1,2 @@
 # Lord of Dunans
-crazy landlords vs mad professors
+Strategy-Combat Game
