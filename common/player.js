@@ -239,6 +239,10 @@ if (Side.getSide() === Side.CLIENT) {
 			this.playerMesh.rotation = new BABYLON.Vector3(0, -this.yaw, 0);
 		}
 		this.pos = this.pos.add(this.velocity.scale(this.mainInstance.engine.getDeltaTime() / 1000));
+		
+		if (this.mainInstance.thePlayer === this && !((this.mainInstance.frame - this.world.initialFrame) % 9)) {
+			this.mainInstance.sendToServer(new Packet.playerRotationPacket(this.uuid, this.yaw, this.pitch));
+		}
 	};
 } else {
 	Player.prototype.updateTick = function (delta) {

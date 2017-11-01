@@ -18,6 +18,26 @@ const PacketHandler = require("common/lib/packethandler");
  */
 function GameWorld(mainInstance) {
 	World.call(this, mainInstance);
+	if (Side.getSide() === Side.CLIENT) {
+		this.updatePlayerRotation = (e) => {
+			this.mainInstance.thePlayer.yaw -= e.movementX / 130;
+			this.mainInstance.thePlayer.pitch -= e.movementY / 130;
+		};
+		this.canvasClick = (e) => {
+			this.mainInstance.canvas.requestPointerLock = this.mainInstance.canvas.requestPointerLock || this.mainInstance.canvas.mozRequestPointerLock;
+			this.mainInstance.canvas.requestPointerLock();
+			document.addEventListener('pointerlockchange', this.lockChange, false);
+			document.addEventListener('mozpointerlockchange', this.lockChange, false);
+		};
+		this.lockChange = (e) => {
+			if (document.pointerLockElement === this.mainInstance.canvas ||
+				document.mozPointerLockElement === this.mainInstance.canvas) {
+				document.addEventListener("mousemove", this.updatePlayerRotation, false);
+			} else {
+				document.removeEventListener("mousemove", this.updatePlayerRotation, false);
+			}
+		};
+	}
 }
 
 GameWorld.prototype = Object.create(World.prototype, {
@@ -50,6 +70,7 @@ GameWorld.prototype.load = function () {
 				return false;
 			}, 'keyup');
 		}
+		this.mainInstance.canvas.addEventListener("click", this.canvasClick);
 	}
 	return this;
 };
@@ -62,6 +83,12 @@ GameWorld.prototype.unload = function () {
 		for (let dir of Directions.getDirections()) {
 			Mousetrap.unbind(Directions.getKeyForDirection(dir));
 		}
+		
+		this.mainInstance.canvas.removeEventListener("click", this.canvasClick);
+		document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
+		document.exitPointerLock();
+		document.removeEventListener('pointerlockchange', this.lockChange, false);
+		document.removeEventListener('mozpointerlockchange', this.lockChange, false);
 	}
 	return this;
 };
