@@ -1,0 +1,13 @@
+#crystal_bar {
+	position: fixed;
+	top: 0;
+	right: 0;
+	font-size: 1.7em;
+}
+#crystal_bar > .crystal {
+	width: 1em;
+	height: 1em;
+}
+#crystal_bar > .crystal, #crystal_bar > span[data-crystal] {
+	vertical-align: middle;
+}

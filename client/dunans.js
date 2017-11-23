@@ -1,9 +1,10 @@
+require('client/lib/l10n_keys');
+
 const PacketHandler = require('common/packethandler_registrar');
 const BABYLON = require('babylonjs');
 const World = require('common/world');
 const EmptyWorld = require('common/menu/empty_world');
 const RenderManager = require('client/lib/render/render_manager');
-require('client/lib/l10n_keys');
 
 const getWS = path => (location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + location.hostname
 + (location.port ? ':'+location.port : '') + path;

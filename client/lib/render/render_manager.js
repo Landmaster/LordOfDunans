@@ -14,6 +14,13 @@ function RenderManager(templateScene) {
 	this.idToImported = new Map();
 }
 
+/**
+ * Loads a model.
+ * @param identifier the model identifier
+ * @param root the directory of the model file
+ * @param modelFile the model file
+ * @returns {bluebird|Promise} the model promise, which holds an invisible mesh for one to clone
+ */
 RenderManager.prototype.loadModel = function (identifier, root, modelFile) {
 	if (!this.idToImported.has(identifier)) {
 		let promise = new Promise((res, rej) => {

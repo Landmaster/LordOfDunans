@@ -43,6 +43,11 @@ function PreparationWorld(mainInstance) {
 		
 		this.htmlElementsToToggle.push(this.matchReview);
 		
+		this.infoBar = document.getElementById("info_bar");
+		this.infoBar.textContent = '$blank_info'.toLocaleString();
+		
+		this.htmlElementsToToggle.push(this.infoBar);
+		
 		this._updateMatchReview();
 	}
 }
@@ -127,6 +132,7 @@ if (Side.getSide() === Side.CLIENT) {
 				_nameReview.textContent = player.uname;
 				_playerBody.appendChild(_nameReview);
 				
+				// specific to the main player
 				if (player === this.mainInstance.thePlayer) {
 					let _chosenCharacterHeader = document.createElement("p");
 					_chosenCharacterHeader.classList.add("chosen_character_header");
@@ -141,9 +147,18 @@ if (Side.getSide() === Side.CLIENT) {
 						_characterMark.classList.add("character_mark");
 						_characterMark.src = char.avatarImage();
 						_characterMark.alt = ('$character_'+str).toLocaleString();
+						
 						_characterMark.addEventListener("click", () => {
 							this.mainInstance.sendToServer(new Packet.setCharacterTypePacket(this.mainInstance.thePlayer.uuid, str));
 						});
+						
+						_characterMark.addEventListener("mouseenter", () => {
+							this.infoBar.textContent = ('$character_'+str+'_info').toLocaleString();
+						});
+						_characterMark.addEventListener("mouseout", () => {
+							this.infoBar.textContent = '$blank_info'.toLocaleString();
+						});
+						
 						_characterSelection.appendChild(_characterMark);
 					}
 					
@@ -347,6 +362,9 @@ const playerUpdateHandler = (ev, data) => {
 		if (data instanceof PlayerAddedEvent) {
 			data.player.setCharacterType(CharacterTypeBase.EMPTY);
 			data.player.clearChosenTowers();
+			if (Side.getSide() === Side.CLIENT) {
+				data.player.markCrystalsForUpdate();
+			}
 		}
 		if (Side.getSide() === Side.CLIENT) {
 			data.world._updateMatchReview();

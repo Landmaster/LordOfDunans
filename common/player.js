@@ -1,6 +1,7 @@
 /**
  * @author Landmaster
  */
+require('css.escape');
 
 const Promise = require('bluebird');
 const UuidUtils = require('./lib/uuid_utils');
@@ -100,6 +101,16 @@ function Player(world, ws, mainInstance, options) {
 	 * @type {Array.<Function>}
 	 */
 	this.chosenTowers = new Array(EntityRegistry.TOWERS_PER_PLAYER);
+	
+	this.crystals = {
+		red: 0,
+		green: 0,
+		blue: 0,
+	};
+	
+	if (Side.getSide() === Side.CLIENT) {
+		this._doUpdateCrystals = true;
+	}
 	
 	/**
 	 * The index of a player is a number, 0 or 1, which determines the
@@ -242,6 +253,27 @@ if (Side.getSide() === Side.CLIENT) {
 		
 		if (this.mainInstance.thePlayer === this && !((this.mainInstance.frame - this.world.initialFrame) % 9)) {
 			this.mainInstance.sendToServer(new Packet.playerRotationPacket(this.uuid, this.yaw, this.pitch));
+		}
+		
+		this.updateCrystals();
+	};
+	
+	Player.prototype.markCrystalsForUpdate = function () {
+		this._doUpdateCrystals = true;
+	};
+	
+	Player.prototype.updateCrystals = function () {
+		if (this._doUpdateCrystals) {
+			let crystalBar = document.getElementById("crystal_bar");
+			
+			for (let crystalName in this.crystals) {
+				if (this.crystals.hasOwnProperty(crystalName)) {
+					let crystalNumber = crystalBar.querySelector("[data-crystal=" + CSS.escape(crystalName) + "]");
+					crystalNumber.textContent = this.crystals[crystalName];
+				}
+			}
+			
+			this._doUpdateCrystals = false;
 		}
 	};
 } else {

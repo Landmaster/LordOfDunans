@@ -33,7 +33,10 @@ String.toLocaleString({
 		$error_opponent_disconnected: 'Opponent disconnected',
 		$error_user_already_logged: 'User ‘%s’ is already logged on',
 		
+		$blank_info: 'Hover over a character or tower for more info.',
+		
 		$character_landmaster: 'Landmaster',
+		$character_landmaster_info: 'The developer of this game, Landmaster, brings high-powered attacks to the table.',
 		
 		$prep_chosen_character: 'Chosen character: %s',
 		$prep_tower: 'Towers',

@@ -3,6 +3,7 @@
 
 @import "menu.css";
 @import "prep.css";
+@import "game.css";
 
 html {
 	font-family: Lato, sans-serif;

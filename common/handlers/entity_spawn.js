@@ -14,7 +14,7 @@ PacketHandler.register(0x0010, Packet.entitySpawnedPacket, (packet, mainInstance
 	}
 });
 
-PacketHandler.register(0x0011, Packet.entityDeathPacket, (packet, mainInstance, ctx) => {
+PacketHandler.register(0x0011, Packet.entityDespawnPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT && mainInstance.theWorld) {
 		mainInstance.theWorld.nonPlayerEntities.delete(packet.uuid);
 	}

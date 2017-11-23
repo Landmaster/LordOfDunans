@@ -37,6 +37,10 @@ function GameWorld(mainInstance) {
 				document.removeEventListener("mousemove", this.updatePlayerRotation, false);
 			}
 		};
+		this.crystalBar = document.getElementById("crystal_bar");
+		this.entityBar = document.getElementById("entity_bar");
+		
+		this.htmlElementsToToggle.push(this.crystalBar, this.entityBar);
 	}
 }
 
@@ -144,6 +148,18 @@ if (Side.getSide() === Side.CLIENT) {
 			}
 			for (let player of this.players.values()) {
 				packets.forEach(pkt => PacketHandler.sendToEndpoint(pkt, player.ws));
+			}
+		}
+		
+		// Distribute crystals every second
+		if (!(this.elapsedTicks % 20)) {
+			for (let player of this.players.values()) {
+				for (let crystalName in player.crystals) {
+					if (player.crystals.hasOwnProperty(crystalName)) {
+						player.crystals[crystalName] += 10;
+					}
+				}
+				PacketHandler.sendToEndpoint(new Packet.updateCrystalPacket(player.uuid, player.crystals), player.ws);
 			}
 		}
 	}

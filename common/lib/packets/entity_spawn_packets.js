@@ -38,13 +38,13 @@ Packet.entitySpawnedPacket.prototype.newEntity = function (world) {
  * @param byteUUID
  * @constructor
  */
-Packet.entityDeathPacket = function entityDeathPacket(byteUUID) {
+Packet.entityDespawnPacket = function entityDeathPacket(byteUUID) {
 	this.uuid = byteUUID;
 };
-Packet.entityDeathPacket.prototype.deserialize = function (buf) {
+Packet.entityDespawnPacket.prototype.deserialize = function (buf) {
 	this.uuid = buf.readBytes(16);
 };
-Packet.entityDeathPacket.prototype.serialize = function (buf) {
+Packet.entityDespawnPacket.prototype.serialize = function (buf) {
 	buf.append(this.uuid);
 };
 

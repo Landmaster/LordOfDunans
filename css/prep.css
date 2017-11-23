@@ -96,3 +96,12 @@
 .tower_mark.chosen {
 	box-shadow: 0 0 5px 5px rgba(0, 255, 164, 0.2);
 }
+#info_bar {
+	border-radius: 1em;
+	background-color: #0e0067;
+	position: fixed;
+	top: 0;
+	right: 0;
+	width: 20ch;
+	padding: 1em;
+}

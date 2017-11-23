@@ -11,3 +11,4 @@ require('./handlers/entity_spawn');
 require('./handlers/player_spawn');
 require('./handlers/game_init');
 require('./handlers/positioning');
+require('./handlers/game_update');

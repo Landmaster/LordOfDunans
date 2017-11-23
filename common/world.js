@@ -1,4 +1,6 @@
 /**
+ * Games and menu screens are implemented as "worlds" in Lord of Dunans. The programming concept was inspired in
+ * part by Minecraft.
  * @author Landmaster
  */
 
