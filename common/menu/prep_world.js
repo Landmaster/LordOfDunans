@@ -302,32 +302,34 @@ if (Side.getSide() === Side.CLIENT) {
 	PreparationWorld.prototype.updateTick = function updateTick (delta) {
 		World.prototype.updateTick.call(this, delta);
 		let prevFloor = Math.floor(this.timeRemaining);
-		this.timeRemaining -= (1000 / World.TICKS_PER_SEC);
-		if (Math.floor(this.timeRemaining) < prevFloor) {
-			for (let player of this.players.values()) {
-				PacketHandler.sendToEndpoint(new Packet.prepTimerPacket(this.timeRemaining), player.ws);
-			}
-		}
-		if (this.timeRemaining <= 0) {
-			const EmptyWorld = require('./empty_world');
-			
-			let willStart = true;
-			for (let player of this.players.values()) {
-				if (!player.verifyPlayable()) {
-					willStart = false;
-					break;
-				}
-			}
-			if (!willStart) {
+		if (this.players.size >= 2) { // i.e. players already chosen
+			this.timeRemaining -= (1000 / World.TICKS_PER_SEC);
+			if (Math.floor(this.timeRemaining) < prevFloor) {
 				for (let player of this.players.values()) {
-					let isCauser = !player.verifyPlayable();
-					player.despawn();
-					player.spawn(new EmptyWorld(this.mainInstance).load());
-					PacketHandler.sendToEndpoint(new Packet.notStartedInTimePacket(isCauser), player.ws);
+					PacketHandler.sendToEndpoint(new Packet.prepTimerPacket(this.timeRemaining), player.ws);
 				}
-				this.unload();
-			} else {
-				this.doStart();
+			}
+			if (this.timeRemaining <= 0) {
+				const EmptyWorld = require('./empty_world');
+				
+				let willStart = true;
+				for (let player of this.players.values()) {
+					if (!player.verifyPlayable()) {
+						willStart = false;
+						break;
+					}
+				}
+				if (!willStart) {
+					for (let player of this.players.values()) {
+						let isCauser = !player.verifyPlayable();
+						player.despawn();
+						player.spawn(new EmptyWorld(this.mainInstance).load());
+						PacketHandler.sendToEndpoint(new Packet.notStartedInTimePacket(isCauser), player.ws);
+					}
+					this.unload();
+				} else {
+					this.doStart();
+				}
 			}
 		}
 	};

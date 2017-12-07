@@ -30,13 +30,13 @@ Directions.getKeyForDirection = function (dir) {
 Directions.getUnitVector = function (dir) {
 	switch (dir) {
 		case Directions.FORWARD:
-			return new Vec3(0,0,1);
-		case Directions.RIGHT:
 			return new Vec3(1,0,0);
-		case Directions.BACKWARD:
+		case Directions.RIGHT:
 			return new Vec3(0,0,-1);
-		case Directions.LEFT:
+		case Directions.BACKWARD:
 			return new Vec3(-1,0,0);
+		case Directions.LEFT:
+			return new Vec3(0,0,1);
 	}
 };
 module.exports = Directions;

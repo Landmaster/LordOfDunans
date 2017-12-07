@@ -48,4 +48,14 @@ Packet.entityDespawnPacket.prototype.serialize = function (buf) {
 	buf.append(this.uuid);
 };
 
+Packet.summonEntityPacket = function summonEntityPacket(index) {
+	this.index = index;
+};
+Packet.summonEntityPacket.prototype.deserialize = function (buf) {
+	this.index = buf.readVarint();
+};
+Packet.summonEntityPacket.prototype.serialize = function (buf) {
+	buf.writeVarint(this.index);
+};
+
 module.exports = Packet;

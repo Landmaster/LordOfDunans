@@ -50,14 +50,28 @@ Vec3.prototype.project = function (on) {
 	return on.scale(this.dotProduct(on) / on.dotProduct(on));
 };
 Vec3.prototype.rotate = function (yaw, pitch) {
+	let oldYaw = Math.atan2(this.z, this.x);
+	let oldPitch = Math.atan2(this.y, Math.sqrt(this.x*this.x + this.z*this.z));
 	return new Vec3(
-		Math.cos(yaw)*Math.cos(pitch),
-		Math.sin(pitch),
-		Math.sin(yaw)*Math.cos(pitch))
+		Math.cos(yaw+oldYaw)*Math.cos(pitch+oldPitch),
+		Math.sin(pitch+oldPitch),
+		Math.sin(yaw+oldYaw)*Math.cos(pitch+oldPitch))
 		.scale(this.len());
 };
 Vec3.prototype.negate = function () {
 	return new Vec3(-this.x,-this.y,-this.z);
+};
+/**
+ *
+ * @param {string} orderString a string, such as "xzy", that determines the position of the old components in the new vector
+ * @return {Vec3} the new vector
+ */
+Vec3.prototype.switchedOrder = function (orderString) {
+	let comps = [];
+	for (let char of orderString) {
+		comps.push(this[char]);
+	}
+	return new Vec3(...comps);
 };
 
 Vec3.prototype.toBabylon = function () {

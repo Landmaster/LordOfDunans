@@ -11,3 +11,36 @@
 #crystal_bar > .crystal, #crystal_bar > span[data-crystal] {
 	vertical-align: middle;
 }
+
+#announcement_bar {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	font-size: 1.4em;
+}
+
+#entity_bar {
+	position: fixed;
+	bottom: 0;
+	right: 0;
+}
+
+#entity_bar > .tower_bar_indicator {
+	float: left;
+	margin: 0.2em;
+	position: relative;
+	border: 3px solid #fff;
+}
+#entity_bar > .tower_bar_indicator::before {
+	content: attr(data-key);
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+	color: rgba(255,255,255,0.5);
+	font-size: 2em;
+}
+#entity_bar > .tower_bar_indicator > .tower_bar_icon {
+	width: 5em;
+	height: 5em;
+}

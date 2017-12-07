@@ -19,3 +19,14 @@ PacketHandler.register(0x0011, Packet.entityDespawnPacket, (packet, mainInstance
 		mainInstance.theWorld.nonPlayerEntities.delete(packet.uuid);
 	}
 });
+
+PacketHandler.register(0x0012, Packet.summonEntityPacket, (packet, mainInstance, ctx) => {
+	if (Side.getSide() === Side.SERVER) {
+		let player = mainInstance.getPlayerFromWS(ctx.ws);
+		let entityClass = player.chosenTowers[packet.index];
+		if (entityClass) { // undefined check
+			//let entity = new entityClass(world);
+			// TODO finish this code
+		}
+	}
+});

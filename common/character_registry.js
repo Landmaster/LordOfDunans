@@ -1,3 +1,5 @@
+const CharacterTypeBase = require("./character_types/character_type_base");
+
 /**
  *
  * @type {Map.<string, CharacterTypeBase>}
@@ -14,7 +16,7 @@ CharacterRegistry.register = function (ctb) {
 	_characterMap.set(ctb.identifier, ctb);
 };
 CharacterRegistry.getCharacterType = function (identifier) {
-	return _characterMap.get(identifier);
+	return _characterMap.get(identifier) || CharacterTypeBase.EMPTY;
 };
 CharacterRegistry.getCharacterIdentifier = function (ctb) {
 	return ctb.identifier;

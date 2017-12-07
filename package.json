@@ -24,13 +24,13 @@
 		"vex-dialog": "^1.0.7",
 		"vex-js": "^3.1.1",
 		"winston": "^2.4.0",
-		"ws": "^3.3.1"
+		"ws": "^3.3.2"
 	},
 	"devDependencies": {
 		"browserify": "^14.5.0",
 		"delete": "^1.1.0",
 		"exorcist": "^0.4.0",
-		"uglify-es": "^3.1.10",
+		"uglify-es": "^3.2.0",
 		"walk": "^2.3.9"
 	},
 	"repository": {

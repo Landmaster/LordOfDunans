@@ -14,6 +14,7 @@ const PlayerAddedEvent = require('common/events/player_added');
 const PlayerRemovedEvent = require('common/events/player_removed');
 const WorldLoadedEvent = require("./events/world_loaded");
 const WorldUnloadedEvent = require("./events/world_unloaded");
+const Vec3 = require("common/math/vec3");
 
 /**
  * Create a new world.
@@ -131,6 +132,31 @@ World.prototype.unload = function () {
 	}
 	this.isLoaded = false;
 	return this;
+};
+
+/**
+ * The maximum absolute value of the x and y coordinates.
+ */
+World.prototype.getWorldSize = function () {
+	return 130;
+};
+
+/**
+ * Return the walls of the game world (other than the world boundary).
+ * @return {Array.<Array.<Vec3>>}
+ */
+World.prototype.getWalls = function () {
+	return [[new Vec3(10,0,10), new Vec3(10,0,110), new Vec3(120,0,110), new Vec3(120,0,50)],
+		[new Vec3(-10,0,-10), new Vec3(-10,0,-110), new Vec3(-120,0,-110), new Vec3(-120,0,-50)],
+		[new Vec3(-10,0,10), new Vec3(-10,0,110), new Vec3(-120,0,110), new Vec3(-120,0,50)],
+		[new Vec3(10,0,-10), new Vec3(10,0,-110), new Vec3(120,0,-110), new Vec3(120,0,-50)],
+		[new Vec3(10,0,0), new Vec3(130,0,50), new Vec3(130,0,-50)],
+		[new Vec3(-10,0,0), new Vec3(-130,0,50), new Vec3(-130,0,-50)]
+	];
+};
+
+World.prototype.rayTrace = function (origin) {
+	// TODO add ray trace code
 };
 
 if (Side.getSide() === Side.CLIENT) {
