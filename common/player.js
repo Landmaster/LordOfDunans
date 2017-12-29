@@ -292,9 +292,7 @@ if (Side.getSide() === Side.CLIENT) {
 		
 		let oldPos = this.pos;
 		this.pos = this.pos.add(this.velocity.scale(1/World.TICKS_PER_SEC));
-		/*if (!(this.mainInstance.frame % 120) && oldPos !== this.pos) {
-			console.log(oldPos, this.pos);
-		}*/
+		
 		let rayScale = this.world.rayTraceScaleFactor(oldPos, this.pos);
 		if (0 <= rayScale && rayScale <= 1.001) {
 			this.pos = oldPos.add(this.pos.sub(oldPos).scale(Math.min(rayScale - 0.002, 0)));

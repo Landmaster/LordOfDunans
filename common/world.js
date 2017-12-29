@@ -172,6 +172,21 @@ World.prototype.rayTraceScaleFactor = function (src, dest) {
 		runningMinScaleFactor = Infinity;
 	}
 	
+	let boundarySize = this.getWorldSize();
+	let outerBoundaries = [
+		new Plane(new Vec3(1,0,0), new Vec3(-boundarySize,0,0)),
+		new Plane(new Vec3(-1,0,0), new Vec3(boundarySize,0,0)),
+		new Plane(new Vec3(0,0,1), new Vec3(0,0,-boundarySize)),
+		new Plane(new Vec3(0,0,-1), new Vec3(0,0,boundarySize))
+	];
+	
+	for (let outerBoundary of outerBoundaries) {
+		let candidate = outerBoundary.intersectLineScaleFactor(src, dest);
+		if (0 <= candidate && candidate <= 1.001) {
+			runningMinScaleFactor = Math.min(runningMinScaleFactor, candidate);
+		}
+	}
+	
 	for (let wall of walls) {
 		for (let i=0; i<wall.length; ++i) {
 			let candidates = Vec3.intersectLinesScaleFactor(src, dest, wall[i], wall[(i+1) % wall.length], "xz");
