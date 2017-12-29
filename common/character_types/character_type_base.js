@@ -36,7 +36,7 @@ if (Side.getSide() === Side.CLIENT) {
 }
 
 CharacterTypeBase.prototype.maxWalkVelocity = function () {
-	return 2;
+	return 4.6;
 };
 /*
 CharacterTypeBase.prototype.accelerationFactor = function () {

@@ -15,6 +15,7 @@ const PlayerRemovedEvent = require('common/events/player_removed');
 const WorldLoadedEvent = require("./events/world_loaded");
 const WorldUnloadedEvent = require("./events/world_unloaded");
 const Vec3 = require("common/math/vec3");
+const Plane = require("./math/plane");
 
 /**
  * Create a new world.
@@ -155,8 +156,32 @@ World.prototype.getWalls = function () {
 	];
 };
 
-World.prototype.rayTrace = function (origin) {
-	// TODO add ray trace code
+/**
+ *
+ * @param {Vec3} src
+ * @param {Vec3} dest
+ * @return {number}
+ */
+World.prototype.rayTraceScaleFactor = function (src, dest) {
+	let walls = this.getWalls();
+	
+	let ground = new Plane(new Vec3(0,1,0), new Vec3(0, -0.001, 0));
+	
+	let runningMinScaleFactor = ground.intersectLineScaleFactor(src, dest);
+	if (!(0 <= runningMinScaleFactor && runningMinScaleFactor <= 1.001)) {
+		runningMinScaleFactor = Infinity;
+	}
+	
+	for (let wall of walls) {
+		for (let i=0; i<wall.length; ++i) {
+			let candidates = Vec3.intersectLinesScaleFactor(src, dest, wall[i], wall[(i+1) % wall.length], "xz");
+			if (candidates.every(cand => (0 <= cand && cand <= 1.001))) {
+				runningMinScaleFactor = Math.min(runningMinScaleFactor, candidates[0]);
+			}
+		}
+	}
+	
+	return runningMinScaleFactor;
 };
 
 if (Side.getSide() === Side.CLIENT) {

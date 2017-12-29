@@ -45,6 +45,18 @@ Vec3.prototype.dist = function (vec) {
 Vec3.prototype.dotProduct = function (vec) {
 	return this.x*vec.x+this.y*vec.y+this.z*vec.z;
 };
+/**
+ *
+ * @param vec the other vector
+ * @param {string} orderString the two components that are considered, such as "xy"
+ * @return {number} the 2d cross product
+ */
+Vec3.prototype.crossProduct2d = function (vec, orderString) {
+	return this[orderString[0]] * vec[orderString[1]] - vec[orderString[0]] * this[orderString[1]];
+};
+Vec3.prototype.crossProduct = function (vec) {
+	return new Vec3(this.y*vec.z - this.z*vec.y, this.z*vec.x - this.x*vec.z, this.x*vec.y - this.y*vec.x);
+};
 Vec3.prototype.project = function (on) {
 	if (on.len2() < 1e-8) return Vec3.zero();
 	return on.scale(this.dotProduct(on) / on.dotProduct(on));
@@ -61,6 +73,23 @@ Vec3.prototype.rotate = function (yaw, pitch) {
 Vec3.prototype.negate = function () {
 	return new Vec3(-this.x,-this.y,-this.z);
 };
+
+/**
+ *
+ * @param {Vec3} a1
+ * @param {Vec3} a2
+ * @param {Vec3} b1
+ * @param {Vec3} b2
+ * @param {string} orderString
+ * @return {Array.<number>} an array such that a1+array[0]*(a2-a1) = b1+array[1]*(b2-b1)
+ */
+Vec3.intersectLinesScaleFactor = function (a1, a2, b1, b2, orderString) {
+	let af = a2.sub(a1), bf = b2.sub(b1);
+	let initDiff = b1.sub(a1);
+	let finalCross = af.crossProduct2d(bf, orderString);
+	return [initDiff.crossProduct2d(bf, orderString) / finalCross, initDiff.crossProduct2d(af, orderString) / finalCross];
+};
+
 /**
  *
  * @param {string} orderString a string, such as "xzy", that determines the position of the old components in the new vector
