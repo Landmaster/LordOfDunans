@@ -10,13 +10,15 @@ const UuidUtils = require('common/lib/uuid_utils');
 PacketHandler.register(0x0010, Packet.entitySpawnedPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT && mainInstance.theWorld) {
 		const ent = packet.newEntity(mainInstance.theWorld);
-		mainInstance.theWorld.nonPlayerEntities.set(UuidUtils.bytesToUuid(packet.uuid), ent);
+		ent.spawn(mainInstance.theWorld);
 	}
 });
 
 PacketHandler.register(0x0011, Packet.entityDespawnPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT && mainInstance.theWorld) {
-		mainInstance.theWorld.nonPlayerEntities.delete(packet.uuid);
+		let stringedUUID = UuidUtils.bytesToUuid(new Uint8Array(packet.uuid.toBuffer()));
+		let ent = mainInstance.theWorld.nonPlayerEntities.get(stringedUUID);
+		if (ent) ent.despawn();
 	}
 });
 
@@ -25,8 +27,19 @@ PacketHandler.register(0x0012, Packet.summonEntityPacket, (packet, mainInstance,
 		let player = mainInstance.getPlayerFromWS(ctx.ws);
 		let entityClass = player.chosenTowers[packet.index];
 		if (entityClass) { // undefined check
-			//let entity = new entityClass(world);
-			// TODO finish this code
+			let posPlusEyeHeight = player.pos.addTriple(0, player.getEyeHeight(), 0);
+			
+			let playerLookVec = player.getLookVec();
+			
+			let rtScaleFactor = player.world.rayTraceScaleFactor(posPlusEyeHeight, posPlusEyeHeight.add(playerLookVec.scale(7)));
+			
+			//console.log(entityClass, rtScaleFactor);
+			
+			if (0 <= rtScaleFactor && rtScaleFactor <= 1.001) {
+				let entity = new entityClass(player.world);
+				entity.pos = posPlusEyeHeight.add(playerLookVec.scale(7*rtScaleFactor));
+				entity.spawn(player.world);
+			}
 		}
 	}
 });

@@ -160,15 +160,16 @@ World.prototype.getWalls = function () {
  *
  * @param {Vec3} src
  * @param {Vec3} dest
+ * @param {boolean} [isRay]
  * @return {number}
  */
-World.prototype.rayTraceScaleFactor = function (src, dest) {
+World.prototype.rayTraceScaleFactor = function (src, dest, isRay) {
 	let walls = this.getWalls();
 	
 	let ground = new Plane(new Vec3(0,1,0), new Vec3(0, -0.001, 0));
 	
 	let runningMinScaleFactor = ground.intersectLineScaleFactor(src, dest);
-	if (!(0 <= runningMinScaleFactor && runningMinScaleFactor <= 1.001)) {
+	if (!(0 <= runningMinScaleFactor && (isRay || runningMinScaleFactor <= 1.001) )) {
 		runningMinScaleFactor = Infinity;
 	}
 	
@@ -182,7 +183,7 @@ World.prototype.rayTraceScaleFactor = function (src, dest) {
 	
 	for (let outerBoundary of outerBoundaries) {
 		let candidate = outerBoundary.intersectLineScaleFactor(src, dest);
-		if (0 <= candidate && candidate <= 1.001) {
+		if (0 <= candidate && (isRay || candidate <= 1.001)) {
 			runningMinScaleFactor = Math.min(runningMinScaleFactor, candidate);
 		}
 	}
@@ -190,7 +191,7 @@ World.prototype.rayTraceScaleFactor = function (src, dest) {
 	for (let wall of walls) {
 		for (let i=0; i<wall.length; ++i) {
 			let candidates = Vec3.intersectLinesScaleFactor(src, dest, wall[i], wall[(i+1) % wall.length], "xz");
-			if (candidates.every(cand => (0 <= cand && cand <= 1.001))) {
+			if (0 <= candidates[0] && (isRay || candidates[0] <= 1.001) && 0 <= candidates[1] && candidates[1] <= 1) {
 				runningMinScaleFactor = Math.min(runningMinScaleFactor, candidates[0]);
 			}
 		}

@@ -206,17 +206,11 @@ if (Side.getSide() === Side.CLIENT) {
 		this.camera.position = this.mainInstance.thePlayer.pos
 			.addTriple(0, this.mainInstance.thePlayer.getEyeHeight(), 0).toBabylon();
 		
-		let yaw = this.mainInstance.thePlayer.yaw,
-			pitch = this.mainInstance.thePlayer.pitch;
+		let targetDir = this.mainInstance.thePlayer.getLookVec();
 		
-		let targetDir = new BABYLON.Vector3(
-			Math.cos(yaw)*Math.cos(pitch),
-			Math.sin(pitch),
-			Math.sin(yaw)*Math.cos(pitch));
+		this.camera.setTarget(this.camera.position.add(targetDir.toBabylon()));
 		
-		this.camera.setTarget(this.camera.position.add(targetDir));
-		
-		this.crossHair.position = this.camera.position.add(targetDir.scale(1.01));
+		this.crossHair.position = this.camera.position.add(targetDir.scale(1.01).toBabylon());
 	};
 	
 	/**

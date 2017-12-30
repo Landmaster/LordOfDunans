@@ -71,7 +71,6 @@ PacketHandler.handle = function handle(buf, mainInstance, ctx) {
 	const handler = DiscriminatorToHandler[discriminator];
 	const packetObj = new packet();
 	packetObj.deserialize(wrapped);
-	wrapped.flip();
 	handler(packetObj, mainInstance, ctx);
 };
 

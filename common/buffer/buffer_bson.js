@@ -17,6 +17,7 @@ BufferBSON.writeBSON = function (buf, object) {
 };
 
 BufferBSON.readBSON = function (buf) {
-	return bson.deserialize(Buffer.from(buf.readBytes(buf.readVarint32()).toBuffer()), undefined);
+	let len = buf.readVarint32();
+	return bson.deserialize(Buffer.from(buf.readBytes(len).toBuffer()), undefined);
 };
 module.exports = BufferBSON;

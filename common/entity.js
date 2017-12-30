@@ -71,11 +71,13 @@ Entity.prototype.spawn = function(world) {
 	this.world.addEntity(this);
 	if (Side.getSide() === Side.CLIENT) {
 		let model = this.model();
-		this.world.mainInstance.renderManager.loadModel(model, '/assets/models/entities', model)
+		this.world.mainInstance.renderManager.loadModel(EntityRegistry.entityClassToId(this.constructor), '/assets/models/entities/', model)
 			.spread((meshes) => {
+				//console.log(meshes);
 				if (meshes && meshes[0]) {
 					this.mesh = meshes[0].clone('entity_model_'+UuidUtils.bytesToUuid(this.uuid));
 					this.mesh.isVisible = true;
+					//console.log(this.mesh);
 				} else {
 					this.mesh = null;
 				}
@@ -115,7 +117,7 @@ if (Side.getSide() === Side.CLIENT) {
 	});
 	
 	Entity.prototype.model = function () {
-		return EntityRegistry.entityClassToId(this.constructor);
+		return EntityRegistry.entityClassToId(this.constructor) + '.babylon';
 	};
 	
 	Entity.prototype.animate = function () {

@@ -241,6 +241,13 @@ Player.prototype.setRotationAndUpdate = function (yaw, pitch) {
 	}
 };
 
+Player.prototype.getLookVec = function () {
+	return new Vec3(
+		Math.cos(this.yaw)*Math.cos(this.pitch),
+		Math.sin(this.pitch),
+		Math.sin(this.yaw)*Math.cos(this.pitch));
+};
+
 if (Side.getSide() === Side.CLIENT) {
 	const BABYLON = require('babylonjs');
 	
