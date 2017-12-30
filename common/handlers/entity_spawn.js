@@ -26,7 +26,16 @@ PacketHandler.register(0x0012, Packet.summonEntityPacket, (packet, mainInstance,
 	if (Side.getSide() === Side.SERVER) {
 		let player = mainInstance.getPlayerFromWS(ctx.ws);
 		let entityClass = player.chosenTowers[packet.index];
+		
 		if (entityClass) { // undefined check
+			for (let crystal in entityClass.prototype.towerCost) {
+				if (entityClass.prototype.towerCost[crystal] > player.crystals[crystal]) {
+					// not enough crystals
+					// TODO send notification to player
+					return;
+				}
+			}
+			
 			let posPlusEyeHeight = player.pos.addTriple(0, player.getEyeHeight(), 0);
 			
 			let playerLookVec = player.getLookVec();
@@ -37,7 +46,15 @@ PacketHandler.register(0x0012, Packet.summonEntityPacket, (packet, mainInstance,
 			
 			if (0 <= rtScaleFactor && rtScaleFactor <= 1.001) {
 				let entity = new entityClass(player.world);
+				
 				entity.pos = posPlusEyeHeight.add(playerLookVec.scale(7*rtScaleFactor));
+				
+				for (let crystal in entityClass.prototype.towerCost) {
+					player.crystals[crystal] -= entityClass.prototype.towerCost[crystal];
+				}
+				
+				PacketHandler.sendToEndpoint(new Packet.updateCrystalPacket(player.uuid, player.crystals), player.ws);
+				
 				entity.spawn(player.world);
 			}
 		}

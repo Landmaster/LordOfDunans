@@ -233,7 +233,7 @@ if (Side.getSide() === Side.CLIENT) {
 } else {
 	GameWorld.prototype.updateTick = function (delta) {
 		World.prototype.updateTick.call(this, delta);
-		if (!(this.elapsedTicks % 3)) {
+		if (!(this.elapsedTicks % 2)) {
 			let packets = [];
 			for (let player of this.players.values()) {
 				packets.push(new Packet.playerPositionPacket(player.uuid, player.pos),
@@ -245,7 +245,7 @@ if (Side.getSide() === Side.CLIENT) {
 		}
 		
 		// Distribute crystals every second
-		if (!(this.elapsedTicks % 20)) {
+		if (!(this.elapsedTicks % World.TICKS_PER_SEC)) {
 			for (let player of this.players.values()) {
 				for (let crystalName in player.crystals) {
 					if (player.crystals.hasOwnProperty(crystalName)) {

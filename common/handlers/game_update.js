@@ -11,9 +11,11 @@ PacketHandler.register(0x0050, Packet.updateCrystalPacket, (packet, mainInstance
 	if (Side.getSide() === Side.CLIENT) {
 		let player = mainInstance.theWorld.players.get(UuidUtils.bytesToUuid(
 			new Uint8Array(packet.playerUUID.toBuffer())));
-		for (let crystalName in player.crystals) {
-			if (player.crystals.hasOwnProperty(crystalName)) {
-				player.crystals[crystalName] = packet.crystals[crystalName];
+		if (player) {
+			for (let crystalName in player.crystals) {
+				if (player.crystals.hasOwnProperty(crystalName)) {
+					player.crystals[crystalName] = packet.crystals[crystalName];
+				}
 			}
 		}
 		player.markCrystalsForUpdate();

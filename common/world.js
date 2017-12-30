@@ -166,11 +166,18 @@ World.prototype.getWalls = function () {
 World.prototype.rayTraceScaleFactor = function (src, dest, isRay) {
 	let walls = this.getWalls();
 	
-	let ground = new Plane(new Vec3(0,1,0), new Vec3(0, -0.001, 0));
+	let ground = new Plane(new Vec3(0,1,0), Vec3.zero());
 	
-	let runningMinScaleFactor = ground.intersectLineScaleFactor(src, dest);
-	if (!(0 <= runningMinScaleFactor && (isRay || runningMinScaleFactor <= 1.001) )) {
+	let runningMinScaleFactor;
+	
+	// noinspection JSSuspiciousNameCombination
+	if (Math.abs(src.y) < 1e-4) {
 		runningMinScaleFactor = Infinity;
+	} else {
+		runningMinScaleFactor = ground.intersectLineScaleFactor(src, dest);
+		if (!(0 <= runningMinScaleFactor && (isRay || runningMinScaleFactor <= 1.001))) {
+			runningMinScaleFactor = Infinity;
+		}
 	}
 	
 	let boundarySize = this.getWorldSize();

@@ -43,6 +43,14 @@ Object.defineProperty(Entity.prototype, 'isTower', {
 });
 
 /**
+ * For tower classes, this is the cost of the tower in crystals.
+ * @type {{red, blue, green}}
+ */
+Object.defineProperty(Entity.prototype, 'towerCost', {
+	value: { red: 120, blue: 120, green: 120 }
+});
+
+/**
  * Deserialize an entity.
  * @param buf
  */
