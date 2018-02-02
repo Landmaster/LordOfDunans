@@ -51,7 +51,11 @@ function Dunans() {
 	this.frame = 0;
 	
 	this.toggleLoginCSS = document.getElementById('toggle_login');
-
+	
+	/**
+	 *
+	 * @type {?World}
+	 */
 	this.theWorld = null;
 	
 	/**

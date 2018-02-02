@@ -216,14 +216,15 @@ if (Side.getSide() === Side.CLIENT) {
 	/**
 	 * Post a message for the game.
 	 * @param {string} message the message
+	 * @param {string} messageType the message type
 	 */
-	GameWorld.prototype.addMessage = function (message) {
+	GameWorld.prototype.addMessage = function (message, messageType) {
 		let wasScrolledToBottom = this.announcementBar.scrollHeight - this.announcementBar.clientHeight <= this.announcementBar.scrollTop + 2;
 		let isUsingPointerLock = document.pointerLockElement === this.mainInstance.canvas ||
 			document.mozPointerLockElement === this.mainInstance.canvas;
 		
 		let msgDiv = document.createElement("div");
-		msgDiv.classList.add("message");
+		msgDiv.classList.add("message", "message-"+messageType);
 		msgDiv.textContent = message;
 		this.announcementBar.appendChild(msgDiv);
 		if (wasScrolledToBottom || isUsingPointerLock) {

@@ -4,11 +4,7 @@
 
 const Packet = {};
 
-const DataTypeIDs = {
-	STRING: 0,
-	NUMBER: 1,
-	BOOL: 2,
-};
+const DataTypeIDs = require('common/lib/data_type_ids');
 
 /**
  * Create a register packet.

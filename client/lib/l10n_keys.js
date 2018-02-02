@@ -54,5 +54,6 @@ String.toLocaleString({
 		
 		$error_not_in_time: 'Did not start in time',
 		$error_opponent_not_in_time: 'Opponent did not start in time',
+		$error_not_enough_crystals: 'Not enough crystals to buy that tower',
 	}
 });

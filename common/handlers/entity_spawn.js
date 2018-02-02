@@ -6,6 +6,7 @@ const PacketHandler = require('common/lib/packethandler');
 const Packet = require('common/lib/packet');
 const Side = require('common/lib/side');
 const UuidUtils = require('common/lib/uuid_utils');
+const MessageTypes = require('common/lib/message_types');
 
 PacketHandler.register(0x0010, Packet.entitySpawnedPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT && mainInstance.theWorld) {
@@ -30,8 +31,7 @@ PacketHandler.register(0x0012, Packet.summonEntityPacket, (packet, mainInstance,
 		if (entityClass) { // undefined check
 			for (let crystal in entityClass.prototype.towerCost) {
 				if (entityClass.prototype.towerCost[crystal] > player.crystals[crystal]) {
-					// not enough crystals
-					// TODO send notification to player
+					PacketHandler.sendToEndpoint(new Packet.sendFormattedMessagePacket(["$error_not_enough_crystals"], MessageTypes.ERROR), player.ws);
 					return;
 				}
 			}
