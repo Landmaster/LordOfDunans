@@ -7,6 +7,7 @@ const Packet = require('common/lib/packet');
 const Side = require('common/lib/side');
 const UuidUtils = require('common/lib/uuid_utils');
 const MessageTypes = require('common/lib/message_types');
+const IterTools = require('common/algo/iter_tools');
 
 PacketHandler.register(0x0010, Packet.entitySpawnedPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT && mainInstance.theWorld) {
@@ -38,24 +39,28 @@ PacketHandler.register(0x0012, Packet.summonEntityPacket, (packet, mainInstance,
 			
 			let posPlusEyeHeight = player.pos.addTriple(0, player.getEyeHeight(), 0);
 			
-			let playerLookVec = player.getLookVec();
+			let scaledPlayerLookVec = player.getLookVec().scale(player.getLookRange());
 			
-			let rtScaleFactor = player.world.rayTraceScaleFactor(posPlusEyeHeight, posPlusEyeHeight.add(playerLookVec.scale(7)));
+			let rtScaleFactor = player.world.rayTraceScaleFactor(posPlusEyeHeight, posPlusEyeHeight.add(scaledPlayerLookVec));
 			
 			//console.log(entityClass, rtScaleFactor);
 			
 			if (0 <= rtScaleFactor && rtScaleFactor <= 1.001) {
 				let entity = new entityClass(player.world);
 				
-				entity.pos = posPlusEyeHeight.add(playerLookVec.scale(7*rtScaleFactor));
+				entity.pos = posPlusEyeHeight.add(scaledPlayerLookVec.scale(rtScaleFactor));
 				
-				for (let crystal in entityClass.prototype.towerCost) {
-					player.crystals[crystal] -= entityClass.prototype.towerCost[crystal];
+				if (entity.getBoundingBoxes().every(aabb => !player.world.entityAABBIntersect(aabb.addVec(entity.pos)).length)) {
+					for (let crystal in entityClass.prototype.towerCost) {
+						player.crystals[crystal] -= entityClass.prototype.towerCost[crystal];
+					}
+					
+					PacketHandler.sendToEndpoint(new Packet.updateCrystalPacket(player.uuid, player.crystals), player.ws);
+					
+					entity.spawn(player.world);
+				} else {
+					PacketHandler.sendToEndpoint(new Packet.sendFormattedMessagePacket(["$error_place_bad_position"], MessageTypes.ERROR), player.ws);
 				}
-				
-				PacketHandler.sendToEndpoint(new Packet.updateCrystalPacket(player.uuid, player.crystals), player.ws);
-				
-				entity.spawn(player.world);
 			}
 		}
 	}

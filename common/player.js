@@ -248,6 +248,10 @@ Player.prototype.getLookVec = function () {
 		Math.sin(this.yaw)*Math.cos(this.pitch));
 };
 
+Player.prototype.getLookRange = function () {
+	return 9.3;
+};
+
 if (Side.getSide() === Side.CLIENT) {
 	const BABYLON = require('babylonjs');
 	

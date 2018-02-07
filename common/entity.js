@@ -8,6 +8,7 @@ const toBuffer = require('typedarray-to-buffer');
 const EntityRegistry = require("./entity_registry");
 const PacketHandler = require("common/lib/packethandler");
 const Packet = require("./lib/packets/entity_spawn_packets");
+const AABB = require("common/math/aabb");
 
 let bson = new BSON();
 
@@ -49,6 +50,14 @@ Object.defineProperty(Entity.prototype, 'isTower', {
 Object.defineProperty(Entity.prototype, 'towerCost', {
 	value: { red: 120, blue: 120, green: 120 }
 });
+
+/**
+ *
+ * @return {Array.<AABB>}
+ */
+Entity.prototype.getBoundingBoxes = function () {
+	return [new AABB(new Vec3(-1,0,-1), new Vec3(1,4,1))];
+};
 
 /**
  * Deserialize an entity.
@@ -108,9 +117,6 @@ Entity.prototype.despawn = function() {
 		let pkt = new Packet.entityDespawnPacket(this.uuid);
 		this.world.players.forEach(player => void(PacketHandler.sendToEndpoint(pkt, player.ws)));
 	}
-};
-
-Entity.prototype.hitBox = function() {
 };
 
 if (Side.getSide() === Side.CLIENT) {

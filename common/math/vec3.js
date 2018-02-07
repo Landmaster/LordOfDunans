@@ -103,6 +103,13 @@ Vec3.prototype.switchedOrder = function (orderString) {
 	return new Vec3(...comps);
 };
 
+Object.defineProperty(Vec3, 'numComponents', {
+	value: 3
+});
+Vec3.prototype.getComponents = function () { return [this.x, this.y, this.z]; };
+Vec3.prototype.getComponent = function (idx) { return this["xyz"[idx]]; };
+Vec3.prototype.setComponent = function (idx, val) { this["xyz"[idx]] = val; };
+
 Vec3.prototype.toBabylon = function () {
 	const BABYLON = require('babylonjs');
 	return new BABYLON.Vector3(this.x, this.y, this.z);

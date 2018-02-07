@@ -35,7 +35,7 @@ PacketHandler.register(0x0051, Packet.sendMessagePacket, (packet, mainInstance, 
 PacketHandler.register(0x0052, Packet.sendFormattedMessagePacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT) {
 		if (mainInstance.theWorld instanceof GameWorld) {
-			console.log(packet);
+			//console.log(packet);
 			packet.locParams[0] = packet.locParams[0].toLocaleString();
 			mainInstance.theWorld.addMessage(sp.sprintf(...packet.locParams), packet.messageType);
 		}

@@ -207,6 +207,21 @@ World.prototype.rayTraceScaleFactor = function (src, dest, isRay) {
 	return runningMinScaleFactor;
 };
 
+/**
+ *
+ * @param {AABB} aabb
+ * @return {Array.<Entity>}
+ */
+World.prototype.entityAABBIntersect = function (aabb) {
+	let res = [];
+	for (let entity of this.nonPlayerEntities.values()) {
+		if (entity.getBoundingBoxes().some(entbb => aabb.intersects(entbb.addVec(entity.pos)))) {
+			res.push(entity);
+		}
+	}
+	return res;
+};
+
 if (Side.getSide() === Side.CLIENT) {
 	const BABYLON = require('babylonjs');
 	const RenderManager = require('client/lib/render/render_manager');

@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"dependencies": {
 		"app-module-path": "^2.2.0",
-		"babylonjs": "^3.0.7",
+		"babylonjs": "^3.1.1",
 		"bcrypt": "^1.0.3",
 		"bluebird": "^3.5.1",
 		"bson": "^1.0.4",
@@ -14,23 +14,23 @@
 		"eventbusjs": "^0.2.0",
 		"express": "^4.16.2",
 		"express-session": "^1.15.6",
-		"helmet": "^3.9.0",
-		"mongodb": "^2.2.33",
+		"helmet": "^3.10.0",
+		"mongodb": "^2.2.34",
 		"mousetrap": "^1.6.1",
 		"node-gameloop": "^0.1.4",
 		"sprintf-js": "^1.1.1",
 		"typedarray-to-buffer": "^3.1.2",
-		"uuid": "^3.1.0",
+		"uuid": "^3.2.1",
 		"vex-dialog": "^1.0.7",
 		"vex-js": "^3.1.1",
 		"winston": "^2.4.0",
-		"ws": "^3.3.2"
+		"ws": "^3.3.3"
 	},
 	"devDependencies": {
 		"browserify": "^14.5.0",
 		"delete": "^1.1.0",
 		"exorcist": "^0.4.0",
-		"uglify-es": "^3.2.1",
+		"uglify-es": "^3.3.9",
 		"walk": "^2.3.9"
 	},
 	"repository": {
