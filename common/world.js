@@ -36,7 +36,7 @@ function World(mainInstance) {
 		 */
 		this.initialFrame = this.mainInstance.frame;
 		
-		this.scene = null;
+		this.scene = this.mainInstance.theScene;
 		this.renderManager = null;
 		
 		this.camera = null;
@@ -227,8 +227,6 @@ if (Side.getSide() === Side.CLIENT) {
 	const RenderManager = require('client/lib/render/render_manager');
 	
 	World.prototype.initScene = function () {
-		this.scene = this.mainInstance.theScene;
-		
 		this.renderManager = this.mainInstance.renderManager;
 		
 		this.camera = new BABYLON.TargetCamera('camera', new BABYLON.Vector3(0,0,0), this.scene);
@@ -256,6 +254,6 @@ if (Side.getSide() === Side.CLIENT) {
  * The number of ticks per second.
  * @type {number}
  */
-World.TICKS_PER_SEC = 20;
+World.TICKS_PER_SEC = 60;
 
 module.exports = World;

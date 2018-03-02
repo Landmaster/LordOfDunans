@@ -30,6 +30,8 @@ function Entity(world) {
 	
 	this.pitch = 0;
 	
+	this.ticksAlive = 0;
+	
 	if (Side.getSide() === Side.CLIENT) {
 		this.mesh = null;
 	}
@@ -57,6 +59,14 @@ Object.defineProperty(Entity.prototype, 'towerCost', {
  */
 Entity.prototype.getBoundingBoxes = function () {
 	return [new AABB(new Vec3(-1,0,-1), new Vec3(1,4,1))];
+};
+
+/**
+ *
+ * @return {number}
+ */
+Entity.prototype.getHeight = function () {
+	return Math.max(...this.getBoundingBoxes().map(aabb => aabb.vec2.y));
 };
 
 /**
@@ -145,6 +155,7 @@ if (Side.getSide() === Side.CLIENT) {
 	};
 } else {
 	Entity.prototype.updateTick = function (delta) {
+		++this.ticksAlive;
 	};
 }
 

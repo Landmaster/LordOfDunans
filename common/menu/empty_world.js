@@ -94,9 +94,10 @@ if (Side.getSide() === Side.CLIENT) {
 		const newWorld = new PreparationWorld(this.mainInstance);
 		if (this.mainInstance.thePlayer) {
 			this.mainInstance.thePlayer.despawn(this.mainInstance.theWorld);
+			this.mainInstance.setWorld(newWorld);
 			this.mainInstance.thePlayer.spawn(newWorld);
 		}
-		this.mainInstance.setWorld(newWorld);
+		this.mainInstance.setWorld(newWorld); // if called a 2nd time, does nothing
 	};
 	
 	EmptyWorld.prototype.openLRDialog = function (isRegister)  {

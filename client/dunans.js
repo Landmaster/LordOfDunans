@@ -110,6 +110,9 @@ Dunans.prototype.getUsername = function () {
 };
 
 Dunans.prototype.setWorld = function setWorld(world) {
+	if (this.theWorld === world) {
+		return; // no-op if worlds are the same
+	}
 	if (this.theWorld) this.theWorld.unload();
 	this.theWorld = world;
 	if (world) world.load();

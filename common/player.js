@@ -19,6 +19,8 @@ const EntityRegistry = require("common/entity_registry");
 const SetChosenTowersEvent = require("./events/set_chosen_towers");
 const Directions = require('common/lib/directions');
 const World = require("./world");
+const AABB = require('common/math/aabb');
+const GameWorld = require('common/gameplay/game_world');
 
 let bson = new BSON();
 
@@ -38,6 +40,13 @@ function Player(world, ws, mainInstance, options) {
 	 * @type {World}
 	 */
 	this.world = world;
+	
+	/**
+	 *
+	 * @type {number}
+	 */
+	this.hp = 10000;
+	
 	/**
 	 * @type {!Vec3}
 	 */
@@ -122,9 +131,21 @@ function Player(world, ws, mainInstance, options) {
 	this.index = 0;
 	
 	if (Side.getSide() === Side.CLIENT) {
+		/**
+		 *
+		 * @type {?BABYLON.Mesh}
+		 */
 		this.playerMesh = null;
+		
+		this.hpTexture = null;
+		this.hpSpriteManager = null;
+		this.hpSprite = null;
 	}
 }
+
+Player.prototype.getMaxHP = function () {
+	return 10000;
+};
 
 Player.prototype.verifyPlayable = function () {
 	if (this.characterType === CharacterTypeBase.EMPTY) {
@@ -141,6 +162,9 @@ Player.prototype.spawn = function (world) {
 	this.world = world;
 	this.world.addPlayer(this);
 	if (Side.getSide() === Side.CLIENT) {
+		const BABYLON = require('babylonjs');
+		const HPBar = require('client/lib/render/textures/hp_bar');
+		
 		this.characterType.modelPromise(this.mainInstance).spread(meshes => {
 			if (meshes && meshes[0]) {
 				this.playerMesh = meshes[0].clone('player_model_'+UuidUtils.bytesToUuid(this.uuid));
@@ -149,6 +173,23 @@ Player.prototype.spawn = function (world) {
 				this.playerMesh = null;
 			}
 		});
+		
+		if (this.world instanceof GameWorld) {
+			this.hpTexture = new HPBar(this, this.world.scene);
+			this.hpTexture.hasAlpha = true;
+			this.hpTexture.wrapU = this.hpTexture.wrapV = BABYLON.Texture.CLAMP_ADDRESSMODE;
+			
+			this.hpSpriteManager = new BABYLON.SpriteManager('sprite_manager_' + UuidUtils.bytesToUuid(this.uuid), '', 1, 256, this.world.scene);
+			this.hpSpriteManager.texture.dispose();
+			
+			// darn it WebStorm…
+			// noinspection JSValidateTypes
+			this.hpSpriteManager.texture = this.hpTexture;
+			
+			this.hpSprite = new BABYLON.Sprite("hp_sprite_" + UuidUtils.bytesToUuid(this.uuid), this.hpSpriteManager);
+			this.hpSprite.size = 1.6;
+			this.hpSprite.invertV = -1;
+		}
 	}
 };
 Player.prototype.despawn = function () {
@@ -158,6 +199,16 @@ Player.prototype.despawn = function () {
 		if (this.playerMesh && this.playerMesh.getScene().getEngine()) {
 			this.playerMesh.dispose();
 			this.playerMesh = null;
+		}
+		
+		if (this.hpTexture && this.hpTexture.getScene().getEngine()) {
+			this.hpSprite.dispose();
+			this.hpSpriteManager.dispose();
+			this.hpTexture.dispose();
+			
+			this.hpTexture = null;
+			this.hpSpriteManager = null;
+			this.hpSprite = null;
 		}
 	}
 };
@@ -252,6 +303,22 @@ Player.prototype.getLookRange = function () {
 	return 9.3;
 };
 
+/**
+ *
+ * @return {Array.<AABB>}
+ */
+Player.prototype.getBoundingBoxes = function () {
+	return this.characterType.getBoundingBoxes(); // delegates to the character type
+};
+
+/**
+ *
+ * @return {number}
+ */
+Player.prototype.getHeight = function () {
+	return Math.max(...this.getBoundingBoxes().map(aabb => aabb.vec2.y));
+};
+
 if (Side.getSide() === Side.CLIENT) {
 	const BABYLON = require('babylonjs');
 	
@@ -264,6 +331,11 @@ if (Side.getSide() === Side.CLIENT) {
 		
 		if (this.mainInstance.thePlayer === this && !((this.mainInstance.frame - this.world.initialFrame) % 9)) {
 			this.mainInstance.sendToServer(new Packet.playerRotationPacket(this.uuid, this.yaw, this.pitch));
+		}
+		
+		if (this.playerMesh && this.hpSprite) {
+			//if (!(this.mainInstance.frame % 20)) console.log(this.hpSprite);
+			this.hpSprite.position = this.pos.addTriple(0, this.getHeight() * 1.4, 0).toBabylon();
 		}
 		
 		this.updateCrystals();
