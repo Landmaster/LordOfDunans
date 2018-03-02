@@ -44,5 +44,5 @@
 		"start-database": "./mongo.sh",
 		"start-server": "node index.js"
 	},
-	"license": "AGPL-1.0"
+	"license": "AGPLv3"
 }
