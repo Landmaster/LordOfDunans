@@ -17,7 +17,7 @@ const Types = {
 	Cosmic: 'Cosmic',
 	Fairy: 'Fairy',
 	Metal: 'Metal',
-	Nature: 'Nature',
+	Flora: 'Flora',
 	Poison: 'Poison',
 	Ice: 'Ice',
 };
