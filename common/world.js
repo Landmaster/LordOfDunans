@@ -208,7 +208,7 @@ World.prototype.rayTraceScaleFactor = function (src, dest, isRay) {
 };
 
 /**
- *
+ * Gets the entities that intersect the AABB.
  * @param {AABB} aabb
  * @return {Array.<Entity>}
  */

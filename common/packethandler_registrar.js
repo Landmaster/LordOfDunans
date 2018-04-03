@@ -3,6 +3,7 @@
  * @author Landmaster
  */
 
+// TODO make sure to add handler files here
 
 module.exports = require('./lib/packethandler');
 
@@ -12,3 +13,4 @@ require('./handlers/player_spawn');
 require('./handlers/game_init');
 require('./handlers/positioning');
 require('./handlers/game_update');
+require('./handlers/attack_damage');

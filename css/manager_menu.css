@@ -1,0 +1,41 @@
+/* TODO add the CSS for the manager menu */
+
+#manager_menu {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: #1c2d67;
+	padding: 0.7em;
+	border-radius: 0.28em;
+	width: 50vw;
+}
+
+#manager_menu h2, #manager_menu h3 {
+	margin: 0;
+	text-align: center;
+}
+
+#attacks_list, #active_attacks_list {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+#manager_menu .attack_desc {
+	background-color: rgba(0,91,103,0.64);
+	padding: 0.5em;
+	margin: 0.5em;
+	flex-grow: 1;
+	text-align: center;
+}
+
+#manager_menu .attack_desc.vacant {
+	border: 2px rgba(14, 0, 103, 0.64) dashed;
+}
+
+.attack_meta {
+	font-style: italic;
+	color: #fff792;
+}

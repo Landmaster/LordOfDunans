@@ -5,6 +5,8 @@ const BABYLON = require('babylonjs');
 const World = require('common/world');
 const EmptyWorld = require('common/menu/empty_world');
 const RenderManager = require('client/lib/render/render_manager');
+require('common/character_types/character_registry_default');
+require('common/attacks/attack_registry_default');
 
 const getWS = path => (location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + location.hostname
 + (location.port ? ':'+location.port : '') + path;

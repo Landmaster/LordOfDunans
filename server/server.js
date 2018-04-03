@@ -19,6 +19,8 @@ const Accounts = require('server/accounts/accounts');
 const AccountError = require('server/accounts/account_error');
 const EmptyWorld = require('common/menu/empty_world');
 const WebSocket = require('ws');
+require('common/character_types/character_registry_default');
+require('common/attacks/attack_registry_default');
 
 function Server(app, port, root, databaseFormat) {
 	root = root || process.cwd();

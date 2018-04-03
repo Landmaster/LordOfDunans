@@ -24,8 +24,8 @@ function HPBar(playerOrEntity, scene) {
 		ctx.clearRect(0, 0, 256, 256);
 		ctx.font = "24px Lato,sans-serif";
 		ctx.textAlign = "center";
-		ctx.fillStyle = "hsl("+( 120*(this.playerOrEntity.hp / this.playerOrEntity.getMaxHP()) )+",100%,50%)";
-		ctx.fillText(this.playerOrEntity.hp+'/'+this.playerOrEntity.getMaxHP(), 128, 70);
+		ctx.fillStyle = "hsl("+( 120*(this.playerOrEntity.getCurHP() / this.playerOrEntity.getMaxHP()) )+",100%,50%)";
+		ctx.fillText(this.playerOrEntity.getCurHP()+'/'+this.playerOrEntity.getMaxHP(), 128, 70);
 		
 		this.update();
 	};

@@ -6,8 +6,8 @@ const browserify = require('browserify');
 const fs = require('fs');
 const UglifyJS = require("uglify-es");
 
-const bfInst = new browserify('./client_main.js', {
-	paths: './'
+const bfInst = browserify('./client_main.js', {
+	paths: ['./']
 });
 bfInst.exclude('winston');
 

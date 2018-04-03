@@ -1,6 +1,14 @@
 /**
  * @author Landmaster
  */
+
+/**
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ * @constructor
+ */
 function Vec3(x,y,z) {
 	this.x = x || 0;
 	this.y = y || 0;
@@ -61,6 +69,12 @@ Vec3.prototype.project = function (on) {
 	if (on.len2() < 1e-8) return Vec3.zero();
 	return on.scale(this.dotProduct(on) / on.dotProduct(on));
 };
+/**
+ *
+ * @param yaw
+ * @param pitch
+ * @return {Vec3}
+ */
 Vec3.prototype.rotate = function (yaw, pitch) {
 	let oldYaw = Math.atan2(this.z, this.x);
 	let oldPitch = Math.atan2(this.y, Math.sqrt(this.x*this.x + this.z*this.z));

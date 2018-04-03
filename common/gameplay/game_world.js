@@ -12,7 +12,7 @@ const Packet = require('common/lib/packet');
 const PacketHandler = require("common/lib/packethandler");
 const EntityRegistry = require('common/entity_registry');
 const EntityKeys = require('common/entities/entity_keys');
-const Ops = require('common/math/ops');
+const Funs = require('common/math/funs');
 
 /**
  *
@@ -23,15 +23,18 @@ function GameWorld(mainInstance) {
 	World.call(this, mainInstance);
 	if (Side.getSide() === Side.CLIENT) {
 		const Loading = require("client/lib/dom/loading");
+		const ManagerMenu = require('client/gameplay/manager_menu');
 		
 		this.updatePlayerRotation = (e) => {
 			this.mainInstance.thePlayer.yaw -= e.movementX / 130;
 			this.mainInstance.thePlayer.pitch -= e.movementY / 130;
-			this.mainInstance.thePlayer.pitch = Ops.clamp(this.mainInstance.thePlayer.pitch, -1.57, 1.57);
+			this.mainInstance.thePlayer.pitch = Funs.clamp(this.mainInstance.thePlayer.pitch, -1.57, 1.57);
 		};
 		this.canvasClick = (e) => {
 			this.mainInstance.canvas.requestPointerLock = this.mainInstance.canvas.requestPointerLock || this.mainInstance.canvas.mozRequestPointerLock;
-			this.mainInstance.canvas.requestPointerLock();
+			if (!ManagerMenu.isOpen()) {
+				this.mainInstance.canvas.requestPointerLock();
+			}
 			document.addEventListener('pointerlockchange', this.lockChange, false);
 			document.addEventListener('mozpointerlockchange', this.lockChange, false);
 		};
@@ -77,10 +80,38 @@ GameWorld.prototype = Object.create(World.prototype, {
 	}
 });
 
+/**
+ *
+ * @param index
+ * @return {Player}
+ */
+GameWorld.prototype.getPlayerByIndex = function (index) {
+	for (let player of this.players.values()) {
+		if (player.index === index) {
+			return player;
+		}
+	}
+};
+
+/**
+ *
+ * @param index
+ * @return {Player}
+ */
+GameWorld.prototype.getOpponent = function (index) {
+	return this.getPlayerByIndex(1 - index);
+};
+
 GameWorld.prototype.load = function () {
 	World.prototype.load.call(this);
 	if (Side.getSide() === Side.CLIENT) {
 		const Mousetrap = require('mousetrap');
+		const ManagerMenu = require('client/gameplay/manager_menu');
+		
+		// add manager menu opening key binding
+		Mousetrap.bind('q', (e) => {
+			ManagerMenu.toggle(this.mainInstance);
+		});
 		
 		// add key bindings for movement
 		for (let dir of Directions.getDirections()) {
@@ -115,6 +146,10 @@ GameWorld.prototype.unload = function () {
 	World.prototype.unload.call(this);
 	if (Side.getSide() === Side.CLIENT) {
 		const Mousetrap = require('mousetrap');
+		const ManagerMenu = require('client/gameplay/manager_menu');
+		
+		Mousetrap.unbind('q');
+		ManagerMenu.close(this.mainInstance);
 		
 		// release key bindings for movement
 		for (let dir of Directions.getDirections()) {
@@ -261,6 +296,13 @@ if (Side.getSide() === Side.CLIENT) {
 
 EventBus.addEventListener(PlayerAddedEvent.NAME, (ev, data) => {
 	if (data.world instanceof GameWorld) {
+		// reset crystals
+		for (let crystalName in data.player.crystals) {
+			if (data.player.crystals.hasOwnProperty(crystalName)) {
+				data.player.crystals[crystalName] = 0;
+			}
+		}
+		
 		// set initial positions
 		data.player.setPositionAndUpdate(new Vec3(0,0,-125 + (2*125)*data.player.index));
 		data.player.setRotationAndUpdate(Math.PI * (data.player.index+0.5),0);

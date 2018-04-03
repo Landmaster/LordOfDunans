@@ -6,8 +6,8 @@ const fs = require('fs');
 const browserify = require('browserify');
 const exorcist = require('exorcist');
 
-const bfInst = new browserify('./client_main.js', {
-	paths: './',
+const bfInst = browserify('./client_main.js', {
+	paths: ['./'],
 	debug: true
 });
 bfInst.exclude('winston');

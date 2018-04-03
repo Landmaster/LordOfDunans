@@ -21,6 +21,7 @@ const Directions = require('common/lib/directions');
 const World = require("./world");
 const AABB = require('common/math/aabb');
 const GameWorld = require('common/gameplay/game_world');
+const DamageSource = require('common/damage/damage_source');
 
 let bson = new BSON();
 
@@ -40,12 +41,6 @@ function Player(world, ws, mainInstance, options) {
 	 * @type {World}
 	 */
 	this.world = world;
-	
-	/**
-	 *
-	 * @type {number}
-	 */
-	this.hp = 10000;
 	
 	/**
 	 * @type {!Vec3}
@@ -107,6 +102,18 @@ function Player(world, ws, mainInstance, options) {
 	
 	/**
 	 *
+	 * @type {CharacterTypeBase.CharacterData}
+	 */
+	this.characterData = CharacterTypeBase.EMPTY.createCharacterData(this);
+	
+	/**
+	 *
+	 * @type {number}
+	 */
+	this.hp = CharacterTypeBase.EMPTY.baseStats(this.characterData).HP;
+	
+	/**
+	 *
 	 * @type {Array.<Function>}
 	 */
 	this.chosenTowers = new Array(EntityRegistry.TOWERS_PER_PLAYER);
@@ -143,8 +150,31 @@ function Player(world, ws, mainInstance, options) {
 	}
 }
 
+Player.prototype.getCurHP = function () {
+	let maxHP = this.getMaxHP();
+	if (this.hp > maxHP) {
+		this.hp = maxHP;
+	}
+	return this.hp;
+};
+
 Player.prototype.getMaxHP = function () {
-	return 10000;
+	return this.characterType.baseStats(this.characterData).HP;
+};
+
+/**
+ *
+ * @param {DamageSource} source
+ */
+Player.prototype.dealDamage = function (source) {
+	let matchupChart = this.characterType.matchup(this.characterData);
+	let damageDealt = source.amount*matchupChart[source.type];
+	this.hp = Math.max(this.hp - damageDealt, 0);
+	if (Side.getSide() === Side.SERVER) {
+		for (let player of this.world.players.values()) {
+			PacketHandler.sendToEndpoint(new Packet.updatePlayerHPPacket(this.uuid, this.hp), player.ws);
+		}
+	}
 };
 
 Player.prototype.verifyPlayable = function () {
@@ -165,7 +195,7 @@ Player.prototype.spawn = function (world) {
 		const BABYLON = require('babylonjs');
 		const HPBar = require('client/lib/render/textures/hp_bar');
 		
-		this.characterType.modelPromise(this.mainInstance).spread(meshes => {
+		this.characterType.modelPromise(this.mainInstance, this.characterData).spread(meshes => {
 			if (meshes && meshes[0]) {
 				this.playerMesh = meshes[0].clone('player_model_'+UuidUtils.bytesToUuid(this.uuid));
 				this.playerMesh.isVisible = true;
@@ -214,13 +244,14 @@ Player.prototype.despawn = function () {
 };
 Player.prototype.setCharacterType = function (type) {
 	this.characterType = type;
+	this.characterData = this.characterType.createCharacterData(this);
 	if (Side.getSide() === Side.CLIENT) {
 		if (this.playerMesh && this.playerMesh.getScene().getEngine()) {
 			this.playerMesh.dispose();
 			this.playerMesh = null;
 		}
 		
-		this.characterType.modelPromise(this.mainInstance).spread(meshes => {
+		this.characterType.modelPromise(this.mainInstance, this.characterData).spread(meshes => {
 			if (meshes && meshes[0]) {
 				this.playerMesh = meshes[0].clone('player_model_'+UuidUtils.bytesToUuid(this.uuid));
 				this.playerMesh.isVisible = true;
@@ -308,7 +339,7 @@ Player.prototype.getLookRange = function () {
  * @return {Array.<AABB>}
  */
 Player.prototype.getBoundingBoxes = function () {
-	return this.characterType.getBoundingBoxes(); // delegates to the character type
+	return this.characterType.getBoundingBoxes(this.characterData); // delegates to the character type
 };
 
 /**
@@ -316,7 +347,7 @@ Player.prototype.getBoundingBoxes = function () {
  * @return {number}
  */
 Player.prototype.getHeight = function () {
-	return Math.max(...this.getBoundingBoxes().map(aabb => aabb.vec2.y));
+	return this.characterType.height(this.characterData);
 };
 
 if (Side.getSide() === Side.CLIENT) {

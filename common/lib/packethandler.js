@@ -18,12 +18,12 @@ const PacketToDiscriminator = new Map();
  * Maps the discriminator short to the packet class.
  * @type {Array.<Function>}
  */
-const DiscriminatorToPacket = new Array(PacketHandler.MAX_DISCRIMINATOR);
+const DiscriminatorToPacket = new Array(PacketHandler.MAX_DISCRIMINATOR+1);
 /**
  * Maps the discriminator short to the packet handler.
  * @type {Array.<messageHandler>}
  */
-const DiscriminatorToHandler = new Array(PacketHandler.MAX_DISCRIMINATOR);
+const DiscriminatorToHandler = new Array(PacketHandler.MAX_DISCRIMINATOR+1);
 
 /**
  * @callback messageHandler

@@ -97,18 +97,16 @@ Entity.prototype.spawn = function(world) {
 	this.world = world;
 	this.world.addEntity(this);
 	if (Side.getSide() === Side.CLIENT) {
-		let model = this.model();
-		this.world.mainInstance.renderManager.loadModel(EntityRegistry.entityClassToId(this.constructor), '/assets/models/entities/', model)
-			.spread((meshes) => {
-				//console.log(meshes);
-				if (meshes && meshes[0]) {
-					this.mesh = meshes[0].clone('entity_model_'+UuidUtils.bytesToUuid(this.uuid));
-					this.mesh.isVisible = true;
-					//console.log(this.mesh);
-				} else {
-					this.mesh = null;
-				}
-			});
+		this.modelPromise().spread((meshes) => {
+			//console.log(meshes);
+			if (meshes && meshes[0]) {
+				this.mesh = meshes[0].clone('entity_model_'+UuidUtils.bytesToUuid(this.uuid));
+				this.mesh.isVisible = true;
+				//console.log(this.mesh);
+			} else {
+				this.mesh = null;
+			}
+		});
 	} else {
 		let pkt = new Packet.entitySpawnedPacket(this, this.uuid);
 		this.world.players.forEach(player => void(PacketHandler.sendToEndpoint(pkt, player.ws)));
@@ -142,6 +140,10 @@ if (Side.getSide() === Side.CLIENT) {
 	
 	Entity.prototype.model = function () {
 		return EntityRegistry.entityClassToId(this.constructor) + '.babylon';
+	};
+	
+	Entity.prototype.modelPromise = function () {
+		return this.world.mainInstance.renderManager.loadModel(EntityRegistry.entityClassToId(this.constructor), '/assets/models/entities/', this.model());
 	};
 	
 	Entity.prototype.animate = function () {

@@ -15,6 +15,9 @@ String.toLocaleString({
 		$gui_back: 'Back',
 		$gui_logout: 'Logout',
 		
+		$gui_attacks: 'Attacks',
+		$gui_active_attacks: 'Active Attacks',
+		
 		$prompt_choose_character: 'Choose Main and Towers',
 		
 		$data_username: 'Username',
@@ -36,7 +39,7 @@ String.toLocaleString({
 		$blank_info: 'Hover over a character or tower for more info.',
 		
 		$character_landmaster: 'Landmaster',
-		$character_landmaster_info: 'The developer of this game, Landmaster, brings high-powered attacks to the table.',
+		$character_landmaster_info: 'I develop and maintain this game. Need I say more?',
 		
 		$prep_chosen_character: 'Chosen character: %s',
 		$prep_tower: 'Towers',
@@ -56,5 +59,17 @@ String.toLocaleString({
 		$error_opponent_not_in_time: 'Opponent did not start in time',
 		$error_not_enough_crystals: 'Not enough crystals to buy that tower',
 		$error_place_bad_position: 'The tower will not fit here!',
+		
+		$attack_plasma_whip: 'Plasma Whip',
+		
+		$attack_slot_neutral: 'Neutral',
+		$attack_slot_forward: 'Forward',
+		$attack_slot_up: 'Up',
+		$attack_slot_down: 'Down',
+		
+		$attack_slot_neutral2: 'Neutral 2',
+		$attack_slot_forward2: 'Forward 2',
+		$attack_slot_up2: 'Up 2',
+		$attack_slot_down2: 'Down 2',
 	}
 });

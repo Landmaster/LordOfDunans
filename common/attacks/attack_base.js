@@ -1,19 +1,31 @@
+/**
+ * @author Landmaster
+ */
+
 const Side = require("common/lib/side");
 
 /**
  * Abstract class for player attacks.
- * @author Landmaster
+ * @param {Player} attacker
+ * @constructor
  */
 function AttackBase(attacker) {
 	this.attacker = attacker;
+	this.startTick = attacker.world.elapsedTicks;
 }
 
 /**
- * Determine whether an attack is enabled.
- * @return {boolean}
+ * 
+ * @type {string}
  */
-AttackBase.prototype.isAllowed = function () {
-	return true;
+AttackBase.unlocName = "";
+
+/**
+ * Duration, in ticks.
+ * @return {number}
+ */
+AttackBase.prototype.duration = function () {
+	return 10;
 };
 /**
  * Get the cooldown of the special ability, or {@code 0} if the attack is not an ability.
@@ -26,6 +38,10 @@ if (Side.getSide() === Side.CLIENT) {
 	AttackBase.prototype.render = function () {
 	}
 } else {
+	/**
+	 * Called every tick it is active.
+	 * @param delta
+	 */
 	AttackBase.prototype.updateTick = function (delta) {
 	}
 }
