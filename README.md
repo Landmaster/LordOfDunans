@@ -1,5 +1,5 @@
 # Lord of Dunans
-Strategy-Combat Game
+Strategy-Combat Game *(work in progress)*
 
 **TODO detail game mechanics**
 ## Setup
