@@ -110,7 +110,7 @@ function Player(world, ws, mainInstance, options) {
 	 *
 	 * @type {number}
 	 */
-	this.hp = CharacterTypeBase.EMPTY.baseStats(this.characterData).HP;
+	this.hp = CharacterTypeBase.EMPTY.maxHP(this.characterData);
 	
 	/**
 	 *
@@ -158,8 +158,12 @@ Player.prototype.getCurHP = function () {
 	return this.hp;
 };
 
+/**
+ *
+ * @return {number}
+ */
 Player.prototype.getMaxHP = function () {
-	return this.characterType.baseStats(this.characterData).HP;
+	return this.characterType.maxHP(this.characterData);
 };
 
 /**
@@ -169,6 +173,7 @@ Player.prototype.getMaxHP = function () {
 Player.prototype.dealDamage = function (source) {
 	let matchupChart = this.characterType.matchup(this.characterData);
 	let damageDealt = source.amount*matchupChart[source.type];
+	console.log("DEALT "+damageDealt);
 	this.hp = Math.max(this.hp - damageDealt, 0);
 	if (Side.getSide() === Side.SERVER) {
 		for (let player of this.world.players.values()) {
@@ -245,6 +250,7 @@ Player.prototype.despawn = function () {
 Player.prototype.setCharacterType = function (type) {
 	this.characterType = type;
 	this.characterData = this.characterType.createCharacterData(this);
+	this.hp = this.getMaxHP();
 	if (Side.getSide() === Side.CLIENT) {
 		if (this.playerMesh && this.playerMesh.getScene().getEngine()) {
 			this.playerMesh.dispose();
@@ -369,6 +375,10 @@ if (Side.getSide() === Side.CLIENT) {
 			this.hpSprite.position = this.pos.addTriple(0, this.getHeight() * 1.4, 0).toBabylon();
 		}
 		
+		if (this.characterData.currentAttack) {
+			this.characterData.currentAttack.render();
+		}
+		
 		this.updateCrystals();
 	};
 	
@@ -411,7 +421,26 @@ if (Side.getSide() === Side.CLIENT) {
 		if (0 <= rayScale && rayScale <= 1.001) {
 			this.pos = oldPos.add(this.pos.sub(oldPos).scale(Math.min(rayScale - 0.002, 0)));
 		}
+		
+		if (this.characterData.currentAttack) {
+			this.characterData.currentAttack.updateTick(delta);
+			if (this.world.elapsedTicks - this.characterData.currentAttack.startTick >= this.characterData.currentAttack.duration()) {
+				this.characterData.currentAttack = null;
+			}
+		}
 	};
+	
+	/**
+	 * Try to execute an attack.
+	 * @param {number} attackSlotIdx
+	 */
+	Player.prototype.executeAttack = function (attackSlotIdx) {
+		let attackConstr = this.characterData.attackManager.attacks[attackSlotIdx];
+		if (!this.characterData.currentAttack && attackConstr) {
+			//console.log("ATTACK IDX: "+attackSlotIdx);
+			this.characterData.currentAttack = new attackConstr(this);
+		}
+	}
 }
 
 module.exports = Player;

@@ -43,6 +43,15 @@ CharacterTypeBase.prototype.baseStats = function (cdata) {
 	}
 };
 
+/**
+ *
+ * @param cdata
+ * @return {number}
+ */
+CharacterTypeBase.prototype.maxHP = function (cdata) {
+	return this.baseStats(cdata).HP.val;
+};
+
 CharacterTypeBase.prototype.matchup = function (cdata) {
 	return {
 		Normal: 1,
@@ -124,7 +133,7 @@ CharacterTypeBase.CharacterData = function (player) {
 	
 	/**
 	 *
-	 * @type {?Function}
+	 * @type {?AttackBase}
 	 */
 	this.currentAttack = null;
 };

@@ -13,6 +13,7 @@ const PacketHandler = require("common/lib/packethandler");
 const EntityRegistry = require('common/entity_registry');
 const EntityKeys = require('common/entities/entity_keys');
 const Funs = require('common/math/funs');
+const AttackSlotManager = require('common/attacks/attack_slot_manager');
 
 /**
  *
@@ -138,6 +139,8 @@ GameWorld.prototype.load = function () {
 			});
 		});
 		
+		AttackSlotManager.registerHandlers(this.mainInstance);
+		
 		this.mainInstance.canvas.addEventListener("click", this.canvasClick);
 	}
 	return this;
@@ -159,6 +162,8 @@ GameWorld.prototype.unload = function () {
 		EntityKeys.forEach((key) => {
 			Mousetrap.unbind(key);
 		});
+		
+		AttackSlotManager.unregisterHandlers(this.mainInstance);
 		
 		this.mainInstance.canvas.removeEventListener("click", this.canvasClick);
 		document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;

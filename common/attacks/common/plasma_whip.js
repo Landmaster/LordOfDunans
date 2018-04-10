@@ -18,7 +18,7 @@ const AttackRegistry = require('common/attack_registry');
  */
 function PlasmaWhip(attacker) {
 	AttackBase.call(this, attacker);
-	this.victims = new Set();
+	this.victims = new WeakSet();
 }
 
 PlasmaWhip.unlocName = "plasma_whip";
@@ -37,19 +37,23 @@ PlasmaWhip.prototype.duration = function () {
 
 if (Side.getSide() === Side.CLIENT) {
 } else {
-	AttackBase.prototype.updateTick = function (delta) {
+	PlasmaWhip.prototype.updateTick = function (delta) {
+		AttackBase.prototype.updateTick.call(this, delta);
 		let elapsed = this.attacker.world.elapsedTicks - this.startTick;
 		if (1 <= elapsed && elapsed <= 9 && this.attacker.world instanceof GameWorld) {
+			//console.log("ELAPSED "+elapsed);
 			let opponent = this.attacker.world.getOpponent(this.attacker.index);
 			
 			if (!this.victims.has(opponent)) {
 				let eyeHeight = this.attacker.getEyeHeight();
 				
-				let secondOffset = new Vec3(eyeHeight * 0.5, eyeHeight, 0).rotate(this.attacker.yaw, 0);
+				let secondOffset = new Vec3(eyeHeight * 0.5, eyeHeight * 0.5, 0).rotate(this.attacker.yaw, 0);
 				let hitSpheres = [new Sphere(this.attacker.pos.addTriple(0, eyeHeight, 0), eyeHeight * 0.5),
 					new Sphere(this.attacker.pos.add(secondOffset), eyeHeight * 0.5)];
+				//if (elapsed === 1) console.log(hitSpheres);
 				
-				let oppBoxes = opponent.getBoundingBoxes();
+				let oppBoxes = opponent.getBoundingBoxes().map(aabb => aabb.addVec(opponent.pos));
+				//if (elapsed === 1) console.log(oppBoxes);
 				
 				if (hitSpheres.some(sph => oppBoxes.some(box => sph.intersectAABB(box)))) {
 					opponent.dealDamage(new DamageSource(Types.Normal, 255));

@@ -8,6 +8,7 @@ const Side = require('common/lib/side');
 const UuidUtils = require('common/lib/uuid_utils');
 const AttackRegistry = require('common/attack_registry');
 const GameWorld = require('common/gameplay/game_world');
+const AttackSlotManager = require('common/attacks/attack_slot_manager');
 
 PacketHandler.register(0x0060, Packet.updatePlayerHPPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT) {
@@ -21,7 +22,7 @@ PacketHandler.register(0x0060, Packet.updatePlayerHPPacket, (packet, mainInstanc
 PacketHandler.register(0x0061, Packet.updateAttackPacket, (packet, mainInstance, ctx) => {
 	let player;
 	if (Side.getSide() === Side.SERVER) {
-		player = mainInstance.clientMap.get(UuidUtils.bytesToUuid(new Uint8Array(packet.playerUUID.toBuffer())));
+		player = mainInstance.getPlayerFromWS(ctx.ws);
 	} else {
 		player = mainInstance.theWorld.players.get(UuidUtils.bytesToUuid(new Uint8Array(packet.playerUUID.toBuffer())));
 	}
@@ -39,6 +40,31 @@ PacketHandler.register(0x0061, Packet.updateAttackPacket, (packet, mainInstance,
 				if (player === mainInstance.thePlayer) {
 					ManagerMenu.updateActiveAttack(packet.idx, attack);
 				}
+			}
+		}
+	}
+});
+
+PacketHandler.register(0x0062, Packet.requestAttackPacket1, (packet, mainInstance, ctx) => {
+	if (Side.getSide() === Side.SERVER) {
+		let player = mainInstance.getPlayerFromWS(ctx.ws);
+		if (player) {
+			if (!player.movementDirections.size) {
+				player.executeAttack(AttackSlotManager.SLOT_NAMES.indexOf('neutral'));
+			}
+		}
+	}
+});
+
+PacketHandler.register(0x0063, Packet.updateCurrentAttackPacket, (packet, mainInstance, ctx) => {
+	if (Side.getSide() === Side.CLIENT) {
+		let player = mainInstance.theWorld.players.get(UuidUtils.bytesToUuid(new Uint8Array(packet.playerUUID.toBuffer())));
+		if (player) {
+			if (packet.idx >= 0) {
+				let attackConstr = player.characterData.attackManager.attacks[packet.idx];
+				player.characterData.currentAttack = new attackConstr(player);
+			} else {
+				player.characterData.currentAttack = null;
 			}
 		}
 	}
