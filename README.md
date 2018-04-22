@@ -1,7 +1,6 @@
 # Lord of Dunans
-Strategy-Combat Game *(work in progress)*
+A strategy-combat game where you control a character, summon towers, and battle alongside summoned entities to defend your side of the field from the enemy.
 
-**TODO detail game mechanics**
 ## Setup
 After cloning this repository, create `private` and `db` folders in the root of the repository directory.
 
@@ -27,5 +26,6 @@ Use `npm run clean` to automatically delete the output JavaScript file (and poss
 
 ## License
 Lord of Dunans is licensed under the AGPL v3.
+
 ## Credits
 Main Developer: @Landmaster
