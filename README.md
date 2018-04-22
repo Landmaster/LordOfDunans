@@ -1,5 +1,8 @@
 # Lord of Dunans
-A strategy-combat game where you control a character, summon towers, and battle alongside summoned entities to defend your side of the field from the enemy.
+A (work-in-progress) strategy-combat game where you control a character, summon towers, and battle alongside summoned entities to defend your side of the field from the enemy.
+
+## Caveats
+As of April 2018, this game is still in the early stages of its development. Use at your own risk.
 
 ## Setup
 After cloning this repository, create `private` and `db` folders in the root of the repository directory.
