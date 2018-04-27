@@ -4,7 +4,7 @@
 	"dependencies": {
 		"app-module-path": "^2.2.0",
 		"babylonjs": "^3.1.1",
-		"bcrypt": "^1.0.3",
+		"bcrypt": "^2.0.1",
 		"bluebird": "^3.5.1",
 		"bson": "^1.0.6",
 		"buffer": "^5.1.0",
@@ -23,7 +23,7 @@
 		"uuid": "^3.2.1",
 		"vex-dialog": "^1.1.0",
 		"vex-js": "^3.1.1",
-		"winston": "^2.4.1",
+		"winston": "^2.4.2",
 		"ws": "^3.3.3"
 	},
 	"devDependencies": {
@@ -31,7 +31,7 @@
 		"delete": "^1.1.0",
 		"exorcist": "^0.4.0",
 		"uglify-es": "^3.3.10",
-		"walk": "^2.3.9"
+		"walk": "^2.3.13"
 	},
 	"repository": {
 		"type": "git",
