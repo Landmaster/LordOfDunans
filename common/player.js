@@ -173,7 +173,7 @@ Player.prototype.getMaxHP = function () {
 Player.prototype.dealDamage = function (source) {
 	let matchupChart = this.characterType.matchup(this.characterData);
 	let damageDealt = source.amount*matchupChart[source.type];
-	console.log("DEALT "+damageDealt);
+	//console.log("DEALT "+damageDealt);
 	this.hp = Math.max(this.hp - damageDealt, 0);
 	if (Side.getSide() === Side.SERVER) {
 		for (let player of this.world.players.values()) {

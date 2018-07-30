@@ -61,3 +61,37 @@ PacketHandler.register(0x0043, Packet.playerRotationPacket, (packet, mainInstanc
 		}
 	}
 });
+PacketHandler.register(0x0044, Packet.entityPositionPacket, (packet, mainInstance, ctx) => {
+	if (Side.getSide() === Side.CLIENT) {
+		if (mainInstance.theWorld) {
+			let uuidString = UuidUtils.bytesToUuid(new Uint8Array(packet.uuid.toBuffer()));
+			let entity = mainInstance.theWorld.nonPlayerEntities.get(uuidString);
+			if (entity) {
+				entity.pos = packet.pos;
+			}
+		}
+	}
+});
+PacketHandler.register(0x0045, Packet.entityVelocityPacket, (packet, mainInstance, ctx) => {
+	if (Side.getSide() === Side.CLIENT) {
+		if (mainInstance.theWorld) {
+			let uuidString = UuidUtils.bytesToUuid(new Uint8Array(packet.uuid.toBuffer()));
+			let entity = mainInstance.theWorld.nonPlayerEntities.get(uuidString);
+			if (entity) {
+				entity.velocity = packet.velocity;
+			}
+		}
+	}
+});
+PacketHandler.register(0x0046, Packet.entityRotationPacket, (packet, mainInstance, ctx) => {
+	if (Side.getSide() === Side.CLIENT) {
+		if (mainInstance.theWorld) {
+			let uuidString = UuidUtils.bytesToUuid(new Uint8Array(packet.uuid.toBuffer()));
+			let entity = mainInstance.theWorld.nonPlayerEntities.get(uuidString);
+			if (entity) {
+				entity.yaw = packet.yaw;
+				entity.pitch = packet.pitch;
+			}
+		}
+	}
+});

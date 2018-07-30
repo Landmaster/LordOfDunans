@@ -9,6 +9,8 @@ const EntityRegistry = require("./entity_registry");
 const PacketHandler = require("common/lib/packethandler");
 const Packet = require("./lib/packets/entity_spawn_packets");
 const AABB = require("common/math/aabb");
+const AIManager = require('common/entities/ai/ai_manager');
+const World = require('common/world');
 
 let bson = new BSON();
 
@@ -25,12 +27,16 @@ function Entity(world) {
 		this.uuid = Buffer.alloc(16);
 	}
 	this.pos = Vec3.zero();
+	this.velocity = Vec3.zero();
+	this.acceleration = Vec3.zero();
 	
 	this.yaw = 0;
 	
 	this.pitch = 0;
 	
 	this.ticksAlive = 0;
+	
+	this.aiManager = new AIManager(this);
 	
 	if (Side.getSide() === Side.CLIENT) {
 		this.mesh = null;
@@ -146,9 +152,6 @@ if (Side.getSide() === Side.CLIENT) {
 		return this.world.mainInstance.renderManager.loadModel(EntityRegistry.entityClassToId(this.constructor), '/assets/models/entities/', this.model());
 	};
 	
-	Entity.prototype.animate = function () {
-	};
-
 	Entity.prototype.render = function () {
 		if (this.mesh) {
 			this.mesh.position = this.pos.toBabylon();
@@ -158,6 +161,22 @@ if (Side.getSide() === Side.CLIENT) {
 } else {
 	Entity.prototype.updateTick = function (delta) {
 		++this.ticksAlive;
+		
+		this.aiManager.updateTick(delta);
+		
+		this.velocity = this.velocity.add(this.acceleration.scale(1/World.TICKS_PER_SEC));
+		
+		let oldPos = this.pos;
+		this.pos = this.pos.add(this.velocity.scale(1/World.TICKS_PER_SEC));
+		
+		let rayScale = this.world.rayTraceScaleFactor(oldPos, this.pos);
+		if (0 <= rayScale && rayScale <= 1.001) {
+			this.pos = oldPos.add(this.pos.sub(oldPos).scale(Math.min(rayScale - 0.002, 0)));
+		}
+		/*
+		if (this.ticksAlive % 60 === 0) {
+			console.log(this.pos);
+		}*/
 	};
 }
 

@@ -234,7 +234,6 @@ if (Side.getSide() === Side.CLIENT) {
 	};
 	
 	World.prototype.animate = function () {
-		this.nonPlayerEntities.forEach(entity => entity.animate());
 	};
 
 	World.prototype.render = function () {

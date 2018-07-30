@@ -10,6 +10,8 @@ const bfInst = browserify('./client_main.js', {
 	paths: ['./']
 });
 bfInst.exclude('winston');
+bfInst.ignore('oimo');
+bfInst.ignore('cannon');
 
 const walker = walk.walk('./server/', { followLinks: false });
 

@@ -8,11 +8,11 @@ const Side = require('common/lib/side');
 const EmptyWorld = require('common/menu/empty_world');
 const PreparationWorld = require('common/menu/prep_world');
 
-// TODO add handling
-
 PacketHandler.register(0x0020, Packet.playerSpawnedPacket, (packet, mainInstance, ctx) => {
+	// currently unused
 });
 PacketHandler.register(0x0021, Packet.playerDeathPacket, (packet, mainInstance, ctx) => {
+	// TODO add handling
 });
 PacketHandler.register(0x0022, Packet.opponentDisconnectedPacket, (packet, mainInstance, ctx) => {
 	if (Side.getSide() === Side.CLIENT) {

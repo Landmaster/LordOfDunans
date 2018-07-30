@@ -33,9 +33,10 @@ function Server(app, port, root, databaseFormat) {
 		const parsedContent = JSON.parse(content);
 		return mongo.MongoClient.connect(
 			sprintf(databaseFormat || 'mongodb://%s:%s@localhost:27017/lordofdunans', 'loginManager', parsedContent['loginManager']), {
-				promiseLibrary: Promise
+				promiseLibrary: Promise,
+				useNewUrlParser: true
 			});
-	});
+	}).then((client) => client.db('lordofdunans'));
 	this.app = app;
 	
 	this.app.use(require('helmet')());

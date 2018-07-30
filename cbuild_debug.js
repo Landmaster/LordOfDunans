@@ -11,6 +11,8 @@ const bfInst = browserify('./client_main.js', {
 	debug: true
 });
 bfInst.exclude('winston');
+bfInst.ignore('oimo');
+bfInst.ignore('cannon');
 
 const walker = walk.walk('./server/', { followLinks: false });
 

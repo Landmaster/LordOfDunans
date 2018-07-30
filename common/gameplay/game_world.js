@@ -285,6 +285,18 @@ if (Side.getSide() === Side.CLIENT) {
 			}
 		}
 		
+		if (!(this.elapsedTicks % 2)) {
+			// TODO add entity packet stuff
+			let packets = [];
+			for (let entity of this.nonPlayerEntities.values()) {
+				packets.push(new Packet.entityPositionPacket(entity.uuid, entity.pos),
+					new Packet.entityVelocityPacket(entity.uuid, entity.pos));
+			}
+			for (let player of this.players.values()) {
+				packets.forEach(pkt => PacketHandler.sendToEndpoint(pkt, player.ws));
+			}
+		}
+		
 		// Distribute crystals every second
 		if (!(this.elapsedTicks % World.TICKS_PER_SEC)) {
 			for (let player of this.players.values()) {

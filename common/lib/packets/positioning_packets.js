@@ -77,4 +77,56 @@ Packet.controlPlayerPacket.prototype.serialize = function (buf) {
 	buf.writeByte(this.doStop ? 1 : 0);
 };
 
+/**
+ *
+ * @param {Uint8Array|ArrayBuffer|ByteBuffer} entityUUID
+ * @param {Vec3} pos
+ */
+Packet.entityPositionPacket = function entityPositionPacket(entityUUID, pos) {
+	this.uuid = entityUUID;
+	this.pos = pos;
+};
+Packet.entityPositionPacket.prototype.deserialize = function (buf) {
+	this.uuid = buf.readBytes(16);
+	this.pos = Vec3.fromBuf(buf);
+};
+Packet.entityPositionPacket.prototype.serialize = function (buf) {
+	buf.append(this.uuid);
+	Vec3.toBuf(this.pos, buf);
+};
+
+/**
+ *
+ * @param entityUUID
+ * @param velocity
+ */
+Packet.entityVelocityPacket = function entityVelocityPacket(entityUUID, velocity) {
+	this.uuid = entityUUID;
+	this.velocity = velocity;
+};
+Packet.entityVelocityPacket.prototype.deserialize = function (buf) {
+	this.uuid = buf.readBytes(16);
+	this.velocity = Vec3.fromBuf(buf);
+};
+Packet.entityVelocityPacket.prototype.serialize = function (buf) {
+	buf.append(this.uuid);
+	Vec3.toBuf(this.velocity, buf);
+};
+
+Packet.entityRotationPacket = function entityRotationPacket(entityUUID, yaw, pitch) {
+	this.uuid = entityUUID;
+	this.yaw = yaw;
+	this.pitch = pitch;
+};
+Packet.entityRotationPacket.prototype.deserialize = function (buf) {
+	this.uuid = buf.readBytes(16);
+	this.yaw = buf.readDouble();
+	this.pitch = buf.readDouble();
+};
+Packet.entityRotationPacket.prototype.serialize = function (buf) {
+	buf.append(this.uuid);
+	buf.writeDouble(this.yaw);
+	buf.writeDouble(this.pitch);
+};
+
 module.exports = Packet;
