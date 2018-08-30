@@ -10,4 +10,4 @@ const options = commandLineArgs([
 ]);
 
 // start
-module.exports = new Server(app, 8000, __dirname, options.dbformat);
+module.exports = new Server(app, process.env.PORT || 8000, __dirname, options.dbformat);
