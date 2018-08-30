@@ -1,0 +1,1 @@
+npm run start-database & ; npm run start-server
