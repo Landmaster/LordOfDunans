@@ -2,20 +2,16 @@
 A (work-in-progress) strategy-combat game where you control a character, summon towers, and battle alongside summoned entities to defend your side of the field from the enemy.
 
 ## Caveats
-As of April 2018, this game is still in the early stages of its development. Use at your own risk.
+As of August 2018, this game is still in the early stages of its development. Use at your own risk.
 
 ## Setup
 After cloning this repository, create `private` and `db` folders in the root of the repository directory.
 
 In the `db` folder, set up a MongoDB database called `lordofdunans` and add (1) an admin account on the `admin` database for the server operator, and (2) an account named `loginManager` on the `lordofdunans` database for managing the database contents.
 
-In the `private` folder, add two files. The first is the `auth.json` file, which should have the lines
-```
-{
-  "loginManager": "password for the loginManager MongoDB account"
-}
-```
-where `password for the loginManager MongoDB account` should be replaced with the `loginManager` MongoDB account's password.  The second is the `session_info.txt` file; type in a single line of random characters in that file (about 65 characters) which will be the token for login sessions.
+Set the environment variable "LOD_LOGIN_MANAGER" to the password for the loginManager MongoDB account.
+
+In the `private` folder, add one file. This is the `session_info.txt` file; type in a single line of random characters in that file (about 65 characters) which will be the token for login sessions.
 
 Run `npm update` to install dependencies for Lord of Dunans.
 

@@ -29,14 +29,11 @@ function Server(app, port, root, databaseFormat) {
 	/**
 	 * @type {Promise}
 	 */
-	this.db = fs.readFileAsync(root+'/private/auth.json', 'utf-8').then((content) => {
-		const parsedContent = JSON.parse(content);
-		return mongo.MongoClient.connect(
-			sprintf(databaseFormat || 'mongodb://%s:%s@localhost:27017/lordofdunans', 'loginManager', parsedContent['loginManager']), {
-				promiseLibrary: Promise,
-				useNewUrlParser: true
-			});
-	}).then((client) => client.db('lordofdunans'));
+	this.db = mongo.MongoClient.connect(
+		sprintf(databaseFormat || 'mongodb://%s:%s@localhost:27017/lordofdunans', 'loginManager', process.env.LOD_LOGIN_MANAGER), {
+			promiseLibrary: Promise,
+			useNewUrlParser: true
+		}).then((client) => client.db('lordofdunans'));
 	this.app = app;
 	
 	this.app.use(require('helmet')());
