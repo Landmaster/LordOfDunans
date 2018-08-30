@@ -43,7 +43,8 @@
 		"build-debug": "node cbuild_debug.js",
 		"clean": "node cbuild_clean.js",
 		"start-database": "./mongo.sh",
-		"start-server": "node index.js"
+		"start-server": "node index.js",
+		"start": "npm run start-database &; npm run start-server"
 	},
 	"license": "AGPL-3.0-or-later"
 }
