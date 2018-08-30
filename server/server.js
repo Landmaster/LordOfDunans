@@ -39,7 +39,7 @@ function Server(app, port, root, databaseFormat) {
 	this.app.use(require('helmet')());
 	
 	const sessionHandler = session({
-		secret: fs.readFileSync(root+'/private/session_info.txt', 'utf-8'),
+		secret: process.env.LOD_SESSION_TOKEN,
 		name: 'session',
 		store: new MongoStore({ dbPromise: this.db }),
 		cookie: { maxAge: 1000*60*60*24*30 },
