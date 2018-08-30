@@ -9,6 +9,7 @@
 		"bson": "^2.0.6",
 		"buffer": "^5.1.0",
 		"bytebuffer": "^5.0.1",
+		"command-line-args": "^5.0.2",
 		"connect-mongo": "^2.0.1",
 		"css.escape": "^1.5.1",
 		"earcut": "^2.1.3",
