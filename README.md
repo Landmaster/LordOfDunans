@@ -1,6 +1,9 @@
 # Lord of Dunans
 A (work-in-progress) strategy-combat game where you control a character, summon towers, and battle alongside summoned entities to defend your side of the field from the enemy.
 
+## Test server
+A Heroku test server is at http://lordofdunans.herokuapp.com.
+
 ## Caveats
 As of August 2018, this game is still in the early stages of its development. Use at your own risk.
 
