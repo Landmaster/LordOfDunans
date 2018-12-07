@@ -29,7 +29,7 @@
 		"ws": "^5.1.1"
 	},
 	"devDependencies": {
-		"browserify": "^16.2.2",
+		"browserify": "^16.2.3",
 		"delete": "^1.1.0",
 		"exorcist": "^1.0.1",
 		"uglify-es": "^3.3.10",
