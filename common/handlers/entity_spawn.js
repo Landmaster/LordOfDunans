@@ -47,7 +47,7 @@ PacketHandler.register(0x0012, Packet.summonEntityPacket, (packet, mainInstance,
 			
 			if (0 <= rtScaleFactor && rtScaleFactor <= 1.001) {
 				let entity = new entityClass(player.world);
-				
+				entity.side = player.index;
 				entity.pos = posPlusEyeHeight.add(scaledPlayerLookVec.scale(rtScaleFactor));
 				
 				if (entity.getBoundingBoxes().every(aabb => !player.world.entityAABBIntersect(aabb.addVec(entity.pos)).length)) {

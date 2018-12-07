@@ -21,6 +21,13 @@ let bson = new BSON();
  */
 function Entity(world) {
 	this.world = world;
+	
+	/**
+	 * The player that the entity allies with (-1 for neutral).
+	 * @type {number}
+	 */
+	this.side = -1;
+	
 	if (Side.getSide() === Side.SERVER) {
 		this.uuid = v4(null, Buffer.allocUnsafe(16));
 	} else {
@@ -83,6 +90,7 @@ Entity.prototype.deserialize = function (buf) {
 	let obj = BufferBSON.readBSON(buf);
 	this.uuid = new Uint8Array(obj.uuid.read(0, 16));
 	this.pos = Vec3.fromBSON(obj.pos);
+	this.side = obj.side;
 };
 /**
  * Serialize an entity.
@@ -91,7 +99,8 @@ Entity.prototype.deserialize = function (buf) {
 Entity.prototype.serialize = function (buf) {
 	BufferBSON.writeBSON(buf, {
 		uuid: new BSON.Binary(toBuffer(this.uuid), BSON.BSON_BINARY_SUBTYPE_UUID),
-		pos: Vec3.toBSON(this.pos)
+		pos: Vec3.toBSON(this.pos),
+		side: this.side
 	});
 };
 

@@ -37,6 +37,7 @@ if (Side.getSide() === Side.CLIENT) {
 		
 		if (this.ticksAlive % 120 === 60 && this.landlords.size < 5) {
 			let landlord = new PettyLandlord(this.world);
+			landlord.side = this.side;
 			landlord.pos = this.pos;
 			landlord.spawn(landlord.world);
 			this.landlords.add(landlord);
