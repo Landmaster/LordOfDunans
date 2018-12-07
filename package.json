@@ -4,7 +4,7 @@
 	"dependencies": {
 		"app-module-path": "^2.2.0",
 		"babylonjs": "^3.2.0",
-		"bcrypt": "^2.0.1",
+		"bcrypt": "^3.0.2",
 		"bluebird": "^3.5.1",
 		"bson": "^2.0.6",
 		"buffer": "^5.1.0",
